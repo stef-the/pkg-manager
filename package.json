@@ -1,0 +1,46 @@
+{
+	"name": "pkg-manager",
+	"private": true,
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"prepare": "svelte-kit sync || echo ''",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"test:e2e": "playwright test",
+		"tauri": "tauri",
+		"tauri:dev": "tauri dev",
+		"tauri:build": "tauri build",
+		"lint": "eslint .",
+		"format": "prettier --write ."
+	},
+	"devDependencies": {
+		"@playwright/test": "^1.60.0",
+		"@sveltejs/adapter-auto": "^7.0.1",
+		"@sveltejs/adapter-static": "^3.0.10",
+		"@sveltejs/kit": "^2.57.0",
+		"@sveltejs/vite-plugin-svelte": "^7.0.0",
+		"@tailwindcss/vite": "^4.3.0",
+		"@tauri-apps/cli": "^2.11.1",
+		"@testing-library/svelte": "^5.3.1",
+		"eslint": "^10.4.0",
+		"eslint-plugin-svelte": "^3.17.1",
+		"jsdom": "^29.1.1",
+		"playwright": "^1.60.0",
+		"prettier": "^3.8.3",
+		"svelte": "^5.55.2",
+		"svelte-check": "^4.4.6",
+		"tailwindcss": "^4.3.0",
+		"typescript": "^6.0.3",
+		"vite": "^8.0.7",
+		"vitest": "^4.1.6"
+	},
+	"dependencies": {
+		"@tauri-apps/api": "^2.11.0"
+	}
+}
