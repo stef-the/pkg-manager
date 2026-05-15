@@ -53,6 +53,7 @@ pub fn run() {
             commands::get_package_icon_url,
             commands::import_packages,
             commands::install_manager,
+            commands::get_storage_info,
         ])
         .setup(|app| {
             log::info!("Pkg Manager starting up");

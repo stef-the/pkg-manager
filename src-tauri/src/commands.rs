@@ -371,6 +371,58 @@ pub fn open_url(url: String) -> Result<(), String> {
 }
 
 #[tauri::command]
+pub fn get_storage_info() -> Result<Vec<(String, String)>, String> {
+    log::info!("Command: get_storage_info");
+    let mut results: Vec<(String, String)> = Vec::new();
+
+    // Homebrew cellar size
+    if let Ok(output) = run_command_allow_failure("du", &["-sh", "/opt/homebrew/Cellar"]) {
+        if let Some(size) = output.split_whitespace().next() {
+            results.push(("brew".to_string(), size.to_string()));
+        }
+    } else if let Ok(output) = run_command_allow_failure("du", &["-sh", "/usr/local/Cellar"]) {
+        if let Some(size) = output.split_whitespace().next() {
+            results.push(("brew".to_string(), size.to_string()));
+        }
+    }
+
+    // npm global size
+    if let Ok(prefix) = run_command("npm", &["prefix", "-g"]) {
+        let path = format!("{}/lib", prefix.trim());
+        if let Ok(output) = run_command_allow_failure("du", &["-sh", &path]) {
+            if let Some(size) = output.split_whitespace().next() {
+                results.push(("npm".to_string(), size.to_string()));
+            }
+        }
+    }
+
+    // pip packages size
+    if let Ok(output) = run_command_allow_failure("pip3", &["cache", "info"]) {
+        // Try to extract cache size from output
+        for line in output.lines() {
+            if line.contains("Package cache size") || line.contains("size") {
+                if let Some(size_part) = line.split(':').nth(1) {
+                    results.push(("pip".to_string(), size_part.trim().to_string()));
+                    break;
+                }
+            }
+        }
+    }
+
+    // Cargo installs
+    if let Ok(home) = std::env::var("HOME") {
+        let cargo_bin = format!("{}/.cargo/bin", home);
+        if let Ok(output) = run_command_allow_failure("du", &["-sh", &cargo_bin]) {
+            if let Some(size) = output.split_whitespace().next() {
+                results.push(("cargo".to_string(), size.to_string()));
+            }
+        }
+    }
+
+    Ok(results)
+}
+
+#[tauri::command]
 pub fn install_manager(manager: String) -> Result<String, String> {
     log::info!("Command: install_manager({})", manager);
 
