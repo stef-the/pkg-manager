@@ -85,7 +85,7 @@
 	<div class="flex-1 overflow-y-auto">
 	<nav class="flex flex-col gap-0.5 px-3">
 		<span
-			class="mb-1 px-2 text-[11px] font-medium uppercase tracking-wider"
+			class="mb-1 px-2 text-[10px] font-medium uppercase tracking-wider"
 			style="color: var(--text-muted);"
 		>
 			Views
@@ -94,16 +94,10 @@
 			{@const isActive = getActiveView() === item.id}
 			{@const outdatedCount = item.id === 'outdated' ? getTotalOutdatedCount() : 0}
 			<button
-				class="flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-left text-[13px] font-medium transition-colors duration-100"
+				class="flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-left text-[13px] font-medium transition-colors duration-100 hover:bg-[var(--bg-hover)]"
 				style={isActive
 					? `background-color: var(--accent); color: var(--bg-primary);`
 					: `color: var(--text-secondary);`}
-				onmouseenter={(e) => {
-					if (!isActive) e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
-				}}
-				onmouseleave={(e) => {
-					if (!isActive) e.currentTarget.style.backgroundColor = 'transparent';
-				}}
 				onclick={() => setActiveView(item.id)}
 			>
 				<span class="flex w-4 items-center justify-center"><Icon name={item.icon} size={14} /></span>
@@ -125,7 +119,7 @@
 	<!-- Package Managers Filter -->
 	<div class="mt-5 flex flex-col gap-0.5 px-3">
 		<span
-			class="mb-1 px-2 text-[11px] font-medium uppercase tracking-wider"
+			class="mb-1 px-2 text-[10px] font-medium uppercase tracking-wider"
 			style="color: var(--text-muted);"
 		>
 			Managers
@@ -133,16 +127,10 @@
 		{#if true}
 		{@const activeFilter = getActiveManagerFilter()}
 		<button
-			class="flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-left text-[13px] font-medium transition-colors duration-100"
+			class="flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-left text-[13px] font-medium transition-colors duration-100 hover:bg-[var(--bg-hover)]"
 			style={activeFilter === 'all'
 				? `background-color: var(--accent); color: var(--bg-primary);`
 				: `color: var(--text-secondary);`}
-			onmouseenter={(e) => {
-				if (activeFilter !== 'all') e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
-			}}
-			onmouseleave={(e) => {
-				if (activeFilter !== 'all') e.currentTarget.style.backgroundColor = 'transparent';
-			}}
 			onclick={() => setActiveManagerFilter('all')}
 		>
 			<span class="flex w-4 items-center justify-center"><Icon name="all" size={14} /></span>
@@ -151,16 +139,10 @@
 		{#each getAvailableManagers() as manager}
 			{@const isActive = activeFilter === manager.id}
 			<button
-				class="flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-left text-[13px] font-medium transition-colors duration-100"
+				class="flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-left text-[13px] font-medium transition-colors duration-100 hover:bg-[var(--bg-hover)]"
 				style={isActive
 					? `background-color: var(--accent); color: var(--bg-primary);`
 					: `color: var(--text-secondary);`}
-				onmouseenter={(e) => {
-					if (!isActive) e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
-				}}
-				onmouseleave={(e) => {
-					if (!isActive) e.currentTarget.style.backgroundColor = 'transparent';
-				}}
 				onclick={(e) => openManagerMenu(manager, e)}
 				oncontextmenu={(e) => {
 					e.preventDefault();
@@ -178,7 +160,7 @@
 	<!-- Tools -->
 	<div class="mt-5 flex flex-col gap-0.5 px-3">
 		<span
-			class="mb-1 px-2 text-[11px] font-medium uppercase tracking-wider"
+			class="mb-1 px-2 text-[10px] font-medium uppercase tracking-wider"
 			style="color: var(--text-muted);"
 		>
 			Tools
@@ -186,16 +168,10 @@
 		{#each toolItems as item}
 			{@const isActive = getActiveView() === item.id}
 			<button
-				class="flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-left text-[13px] font-medium transition-colors duration-100"
+				class="flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-left text-[13px] font-medium transition-colors duration-100 hover:bg-[var(--bg-hover)]"
 				style={isActive
 					? `background-color: var(--accent); color: var(--bg-primary);`
 					: `color: var(--text-secondary);`}
-				onmouseenter={(e) => {
-					if (!isActive) e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
-				}}
-				onmouseleave={(e) => {
-					if (!isActive) e.currentTarget.style.backgroundColor = 'transparent';
-				}}
 				onclick={() => setActiveView(item.id)}
 			>
 				<span class="flex w-4 items-center justify-center"><Icon name={item.icon} size={14} /></span>
@@ -209,10 +185,8 @@
 	<!-- Bottom Section: Refresh + Preferences (pinned) -->
 	<div class="flex flex-col gap-2 border-t px-3 py-3" style="border-color: var(--border-subtle);">
 		<button
-			class="flex items-center gap-2 rounded-md px-2.5 py-1.5 text-[13px] font-medium transition-colors duration-100"
+			class="flex items-center gap-2 rounded-md px-2.5 py-1.5 text-[13px] font-medium transition-colors duration-100 hover:bg-[var(--bg-hover)]"
 			style="color: var(--text-secondary);"
-			onmouseenter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-hover)')}
-			onmouseleave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
 			onclick={() => refreshPackages()}
 			disabled={isLoading()}
 		>
@@ -222,10 +196,8 @@
 
 		<!-- Preferences -->
 		<button
-			class="flex items-center gap-2 rounded-md px-2.5 py-1.5 text-[13px] font-medium transition-colors duration-100"
+			class="flex items-center gap-2 rounded-md px-2.5 py-1.5 text-[13px] font-medium transition-colors duration-100 hover:bg-[var(--bg-hover)]"
 			style="color: var(--text-secondary);"
-			onmouseenter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-hover)')}
-			onmouseleave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
 			onclick={() => (prefsOpen = true)}
 		>
 			<span class="flex w-4 items-center justify-center"><Icon name="settings" size={14} /></span>

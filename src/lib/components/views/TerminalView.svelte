@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { getAvailableManagers } from '$lib/stores/packages.svelte';
+	import { getAvailableManagers, setActiveView } from '$lib/stores/packages.svelte';
+	import EmptyState from '$lib/components/EmptyState.svelte';
 	import { runTask } from '$lib/stores/tasks.svelte';
 	import { createLogger } from '$lib/utils/logger';
 	import { invoke } from '@tauri-apps/api/core';
@@ -63,7 +64,15 @@
 
 	<!-- Output -->
 	<div class="flex-1 overflow-y-auto px-6 py-4">
-		{#if history.length === 0}
+		{#if getAvailableManagers().length === 0}
+			<EmptyState
+				variant="warning"
+				title="No package managers available"
+				message="Install a package manager to use the terminal."
+				actionLabel="Go to Managers"
+				onaction={() => setActiveView('managers')}
+			/>
+		{:else if history.length === 0}
 			<div class="flex h-full items-center justify-center">
 				<span class="text-[13px]" style="color: var(--text-muted);">
 					Run a command below to get started.

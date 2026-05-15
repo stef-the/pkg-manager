@@ -46,7 +46,7 @@
 			{error.message}
 		</p>
 		<button
-			class="rounded-lg px-6 py-2 text-sm font-medium transition-colors duration-100"
+			class="rounded-lg px-4 py-2 text-[13px] font-medium transition-colors duration-100"
 			style="background-color: var(--accent); color: var(--bg-primary);"
 			onclick={reload}
 		>

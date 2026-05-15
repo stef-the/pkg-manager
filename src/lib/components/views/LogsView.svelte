@@ -1,20 +1,25 @@
 <script lang="ts">
 	import { createLogger } from '$lib/utils/logger';
 	import { addToast } from '$lib/stores/toast.svelte';
+	import EmptyState from '$lib/components/EmptyState.svelte';
+	import LoadingSkeleton from '$lib/components/LoadingSkeleton.svelte';
 	import { invoke } from '@tauri-apps/api/core';
 
 	const log = createLogger('logs');
 
 	let logContent = $state('');
 	let loading = $state(false);
+	let loadError = $state<string | null>(null);
 
 	async function loadLogs() {
 		loading = true;
+		loadError = null;
 		try {
 			const content = await invoke<string>('read_log_file');
 			logContent = content;
 		} catch (e) {
-			logContent = `Failed to load logs: ${e}`;
+			loadError = `${e}`;
+			logContent = '';
 			log.error(`Failed to load logs: ${e}`);
 		} finally {
 			loading = false;

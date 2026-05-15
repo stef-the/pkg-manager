@@ -184,7 +184,7 @@
 		{#if detail?.homepage}
 			<div class="flex justify-end border-t px-5 py-3" style="border-color: var(--border-subtle);">
 				<button
-					class="flex items-center gap-1.5 rounded-lg px-4 py-2 text-[12px] font-medium transition-colors duration-100 hover:opacity-90"
+					class="flex items-center gap-1.5 rounded-lg px-4 py-2 text-[13px] font-medium transition-colors duration-100 hover:opacity-90"
 					style="background-color: var(--accent); color: var(--bg-primary);"
 					onclick={openHomepage}
 				>

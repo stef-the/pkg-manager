@@ -95,7 +95,7 @@
 			<!-- Theme -->
 			<div class="flex flex-col gap-3">
 				<span
-					class="text-[11px] font-medium uppercase tracking-wider"
+					class="text-[10px] font-medium uppercase tracking-wider"
 					style="color: var(--text-muted);"
 				>
 					Appearance
@@ -104,16 +104,10 @@
 					{#each themeOptions as option}
 						{@const isActive = getThemePreference() === option.value}
 						<button
-							class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors duration-100"
+							class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors duration-100 hover:bg-[var(--bg-hover)]"
 							style={isActive
 								? 'background-color: var(--accent); color: var(--bg-primary);'
 								: ''}
-							onmouseenter={(e) => {
-								if (!isActive) e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
-							}}
-							onmouseleave={(e) => {
-								if (!isActive) e.currentTarget.style.backgroundColor = 'transparent';
-							}}
 							onclick={() => setThemePreference(option.value)}
 						>
 							<div class="flex flex-col">
@@ -133,7 +127,7 @@
 			<!-- Date Format -->
 			<div class="flex flex-col gap-3">
 				<span
-					class="text-[11px] font-medium uppercase tracking-wider"
+					class="text-[10px] font-medium uppercase tracking-wider"
 					style="color: var(--text-muted);"
 				>
 					Date Format
@@ -163,7 +157,7 @@
 			<!-- Startup -->
 			<div class="flex flex-col gap-3">
 				<span
-					class="text-[11px] font-medium uppercase tracking-wider"
+					class="text-[10px] font-medium uppercase tracking-wider"
 					style="color: var(--text-muted);"
 				>
 					Startup

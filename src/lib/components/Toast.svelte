@@ -23,7 +23,7 @@
 				class="flex min-w-[280px] max-w-[400px] items-center gap-3 rounded-lg px-4 py-3 shadow-lg"
 				style={typeStyles(toast.type)}
 			>
-				<span class="flex-1 text-sm font-medium">{toast.message}</span>
+				<span class="flex-1 text-[13px] font-medium">{toast.message}</span>
 				<button
 					class="flex-shrink-0 opacity-70 transition-opacity hover:opacity-100"
 					aria-label="Dismiss"

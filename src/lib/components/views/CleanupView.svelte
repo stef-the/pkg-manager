@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { getAvailableManagers } from '$lib/stores/packages.svelte';
+	import { getAvailableManagers, setActiveView } from '$lib/stores/packages.svelte';
+	import EmptyState from '$lib/components/EmptyState.svelte';
 	import { runTask, hasRunningTasks } from '$lib/stores/tasks.svelte';
 	import { createLogger } from '$lib/utils/logger';
 	import type { PackageManager } from '$lib/types';
@@ -46,7 +47,7 @@
 </script>
 
 <div class="flex h-full flex-col">
-	<div class="flex flex-col gap-4 border-b px-6 py-5" style="border-color: var(--border-subtle);">
+	<div class="flex flex-col gap-4 border-b px-6 py-4" style="border-color: var(--border-subtle);">
 		<h1 class="text-lg font-semibold" style="color: var(--text-primary);">Cleanup & Doctor</h1>
 		<p class="text-[13px]" style="color: var(--text-muted);">
 			Run maintenance commands to clean caches and diagnose issues.
@@ -54,6 +55,15 @@
 	</div>
 
 	<div class="flex flex-1 flex-col gap-4 overflow-y-auto px-6 py-5">
+		{#if getAvailableManagers().length === 0}
+			<EmptyState
+				variant="warning"
+				title="No package managers available"
+				message="Install a package manager to run cleanup and diagnostic commands."
+				actionLabel="Go to Managers"
+				onaction={() => setActiveView('managers')}
+			/>
+		{/if}
 		{#each getAvailableManagers() as manager}
 			<div
 				class="flex flex-col gap-3 rounded-lg border p-4"
@@ -83,7 +93,7 @@
 
 		{#if output}
 			<div class="flex flex-col gap-2">
-				<span class="text-[11px] font-medium uppercase tracking-wider" style="color: var(--text-muted);">
+				<span class="text-[10px] font-medium uppercase tracking-wider" style="color: var(--text-muted);">
 					Output
 				</span>
 				<pre

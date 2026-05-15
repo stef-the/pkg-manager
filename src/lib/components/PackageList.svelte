@@ -142,18 +142,12 @@
 				{@const outdated = isPackageOutdated(pkg.name, pkg.manager as PackageManager)}
 
 				<button
-					class="flex items-center gap-4 border-b px-4 py-2.5 text-left transition-colors duration-75"
+					class="flex items-center gap-4 border-b px-4 py-2.5 text-left transition-colors duration-75 hover:bg-[var(--bg-hover)]"
 					style={`border-color: var(--border-subtle); ${
 						isSelected
 							? 'background-color: var(--accent); color: var(--bg-primary);'
 							: ''
 					}`}
-					onmouseenter={(e) => {
-						if (!isSelected) e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
-					}}
-					onmouseleave={(e) => {
-						if (!isSelected) e.currentTarget.style.backgroundColor = 'transparent';
-					}}
 					onclick={() => setSelectedPackage(pkg)}
 				>
 					<!-- Manager icon as package icon fallback -->
@@ -215,16 +209,10 @@
 				{@const outdated = isPackageOutdated(pkg.name, pkg.manager as PackageManager)}
 
 				<button
-					class="flex flex-col gap-2 rounded-lg border p-3 text-left transition-colors duration-100"
+					class="flex flex-col gap-2 rounded-lg border p-3 text-left transition-colors duration-100 hover:bg-[var(--bg-hover)]"
 					style={`border-color: ${isSelected ? 'var(--accent)' : 'var(--border-subtle)'}; ${
 						isSelected ? 'background-color: var(--accent); color: var(--bg-primary);' : ''
 					}`}
-					onmouseenter={(e) => {
-						if (!isSelected) e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
-					}}
-					onmouseleave={(e) => {
-						if (!isSelected) e.currentTarget.style.backgroundColor = 'transparent';
-					}}
 					onclick={() => setSelectedPackage(pkg)}
 				>
 					<div class="flex items-start justify-between">

@@ -4,9 +4,13 @@
 	import {
 		getAllOutdated,
 		isLoadingOutdated,
+		getError,
+		getAvailableManagers,
 		updatePkg,
 		updateAllOutdated,
-		isPackageOutdated
+		isPackageOutdated,
+		setActiveView,
+		refreshPackages
 	} from '$lib/stores/packages.svelte';
 	import type { OutdatedPackage, PackageManager } from '$lib/types';
 
@@ -89,12 +93,28 @@
 
 	<!-- Package List -->
 	<div class="flex-1 overflow-y-auto">
-		{#if isLoadingOutdated()}
+		{#if getError()}
+			<EmptyState
+				variant="error"
+				title="Failed to check for updates"
+				message={getError() ?? 'An unknown error occurred.'}
+				actionLabel="Retry"
+				onaction={refreshPackages}
+			/>
+		{:else if isLoadingOutdated()}
 			<LoadingSkeleton rows={4} />
+		{:else if getAvailableManagers().length === 0}
+			<EmptyState
+				variant="warning"
+				title="No package managers found"
+				message="Install a package manager to check for outdated packages."
+				actionLabel="Go to Managers"
+				onaction={() => setActiveView('managers')}
+			/>
 		{:else if getAllOutdated().length === 0}
 			<EmptyState
 				title="All up to date"
-				message="All your packages are on the latest version"
+				message="All your packages are on the latest version."
 			/>
 		{:else}
 			<div class="flex flex-col">

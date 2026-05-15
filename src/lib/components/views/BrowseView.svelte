@@ -6,10 +6,12 @@
 	import {
 		searchRemotePackages,
 		getSearchResults,
-		isLoading,
+		getSearchError,
+		isLoadingSearch,
 		installPkg,
 		getAvailableManagers,
-		getAllPackages
+		getAllPackages,
+		setActiveView
 	} from '$lib/stores/packages.svelte';
 	import type { PackageManager, Package } from '$lib/types';
 
@@ -90,6 +92,12 @@
 		}
 	}
 
+	function retrySearch() {
+		if (query.trim()) {
+			handleSearch(query);
+		}
+	}
+
 	function isInstalled(name: string, manager: string): boolean {
 		return getAllPackages().some((p) => p.name === name && p.manager === manager);
 	}
@@ -109,7 +117,7 @@
 </script>
 
 <div class="flex h-full flex-col">
-	<div class="flex flex-col gap-4 border-b px-6 py-5" style="border-color: var(--border-subtle);">
+	<div class="flex flex-col gap-4 border-b px-6 py-4" style="border-color: var(--border-subtle);">
 		<h1 class="text-lg font-semibold" style="color: var(--text-primary);">Browse Packages</h1>
 
 		<!-- Manager filter tabs -->
@@ -145,8 +153,24 @@
 	</div>
 
 	<div class="flex-1 overflow-y-auto">
-		{#if isLoading()}
+		{#if getAvailableManagers().length === 0}
+			<EmptyState
+				variant="warning"
+				title="No package managers available"
+				message="Install a package manager to browse and install packages."
+				actionLabel="Go to Managers"
+				onaction={() => setActiveView('managers')}
+			/>
+		{:else if isLoadingSearch()}
 			<LoadingSkeleton />
+		{:else if getSearchError() && hasSearched}
+			<EmptyState
+				variant="error"
+				title="Search failed"
+				message={getSearchError() ?? 'A network or system error occurred. Check your connection and try again.'}
+				actionLabel="Retry"
+				onaction={retrySearch}
+			/>
 		{:else if hasSearched && getSearchResults().length > 0}
 			<!-- Search results -->
 			<div class="flex flex-col">

@@ -4,6 +4,7 @@
 	import LoadingSkeleton from '$lib/components/LoadingSkeleton.svelte';
 	import Icon from '$lib/components/Icons.svelte';
 	import type { IconName } from '$lib/components/Icons.svelte';
+	import EmptyState from '$lib/components/EmptyState.svelte';
 	import {
 		getFilteredPackages,
 		getPackages,
@@ -11,10 +12,12 @@
 		getOutdatedPackages,
 		getAvailableManagers,
 		isLoading,
+		getError,
 		getSearchQuery,
 		setSearchQuery,
 		setActiveView,
-		getLastRefreshed
+		getLastRefreshed,
+		refreshPackages
 	} from '$lib/stores/packages.svelte';
 	import { getDateFormat } from '$lib/stores/theme.svelte';
 	import { invoke } from '@tauri-apps/api/core';
@@ -135,6 +138,28 @@
 			{/if}
 		</div>
 	</div>
+
+	{#if getError()}
+		<div class="px-6">
+			<EmptyState
+				variant="error"
+				title="Failed to load packages"
+				message={getError() ?? 'An unknown error occurred. Check your connection and try again.'}
+				actionLabel="Retry"
+				onaction={refreshPackages}
+			/>
+		</div>
+	{:else if !isLoading() && getAvailableManagers().length === 0}
+		<div class="px-6">
+			<EmptyState
+				variant="warning"
+				title="No package managers found"
+				message="Install a package manager like Homebrew or npm to get started."
+				actionLabel="Go to Managers"
+				onaction={() => setActiveView('managers')}
+			/>
+		</div>
+	{/if}
 
 	<!-- Top stats + chart row -->
 	<div class="flex gap-3 px-6">

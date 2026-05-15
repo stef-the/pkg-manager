@@ -163,7 +163,7 @@
 </script>
 
 <div class="flex h-full flex-col">
-	<div class="flex flex-col gap-4 border-b px-6 py-5" style="border-color: var(--border-subtle);">
+	<div class="flex flex-col gap-4 border-b px-6 py-4" style="border-color: var(--border-subtle);">
 		<h1 class="text-lg font-semibold" style="color: var(--text-primary);">Debloat</h1>
 		<p class="text-[13px]" style="color: var(--text-muted);">
 			Select a cutoff date to find packages you may not need anymore.

@@ -37,14 +37,12 @@
 		{placeholder}
 		{value}
 		oninput={handleInput}
-		class="w-full rounded-lg border py-2 pl-9 pr-8 text-sm outline-none transition-colors duration-100"
+		class="w-full rounded-lg border py-2 pl-9 pr-8 text-[13px] outline-none transition-colors duration-100 focus:border-[var(--accent)]"
 		style={`
 			background-color: var(--surface);
 			border-color: var(--border-subtle);
 			color: var(--text-primary);
 		`}
-		onfocus={(e) => (e.currentTarget.style.borderColor = 'var(--accent)')}
-		onblur={(e) => (e.currentTarget.style.borderColor = 'var(--border-subtle)')}
 	/>
 	{#if value}
 		<button

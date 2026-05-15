@@ -17,6 +17,8 @@ let loadingOutdated = $state(false);
 let loadingAction = $state<string | null>(null);
 let hasLoaded = false;
 let error = $state<string | null>(null);
+let searchError = $state<string | null>(null);
+let loadingSearch = $state(false);
 let searchQuery = $state('');
 let searchResults = $state<Package[]>([]);
 let activeView = $state<ViewId>('dashboard');
@@ -24,29 +26,34 @@ let activeManagerFilter = $state<PackageManager | 'all'>('all');
 let systemStats = $state<SystemStats | null>(null);
 let lastRefreshed = $state<Date | null>(null);
 
-// --- Derived ---
+// --- Derived (optimized: sort once, filter is cheap) ---
 const allPackages: Package[] = $derived.by(() => {
 	const result: Package[] = [];
 	for (const pkgs of packages.values()) {
 		result.push(...pkgs);
 	}
+	// Sort once when package list changes (not on every filter/search)
 	return result.sort((a, b) => a.name.localeCompare(b.name));
 });
 
+// Pre-compute lowercase name+description for faster search matching
+const searchIndex = $derived(
+	allPackages.map((p) => ({
+		pkg: p,
+		lower: `${p.name}\0${p.description}`.toLowerCase()
+	}))
+);
+
 const filteredPackages: Package[] = $derived.by(() => {
-	let list = allPackages;
+	let items = searchIndex;
 	if (activeManagerFilter !== 'all') {
-		list = list.filter((p: Package) => p.manager === activeManagerFilter);
+		items = items.filter((i) => i.pkg.manager === activeManagerFilter);
 	}
 	if (searchQuery.trim()) {
 		const q = searchQuery.toLowerCase().trim();
-		list = list.filter(
-			(p: Package) =>
-				p.name.toLowerCase().includes(q) ||
-				p.description.toLowerCase().includes(q)
-		);
+		items = items.filter((i) => i.lower.includes(q));
 	}
-	return list;
+	return items.map((i) => i.pkg);
 });
 
 const allOutdated: OutdatedPackage[] = $derived.by(() => {
@@ -195,19 +202,38 @@ export function refreshPackages(): void {
 export async function searchRemotePackages(manager: PackageManager, query: string): Promise<void> {
 	if (!query.trim()) {
 		searchResults = [];
+		searchError = null;
 		return;
 	}
-	loading = true;
+	loadingSearch = true;
+	searchError = null;
 	try {
 		searchResults = await commands.searchPackages(manager, query);
 	} catch (e) {
-		const msg = `Search failed: ${e}`;
-		log.error(msg);
-		addToast(msg, 'error');
+		const msg = `${e}`;
+		log.error(`Search failed: ${msg}`);
+		searchError = msg;
 		searchResults = [];
 	} finally {
-		loading = false;
+		loadingSearch = false;
 	}
+}
+
+function isPermissionError(err: unknown): boolean {
+	const msg = `${err}`.toLowerCase();
+	return msg.includes('permission denied') ||
+		msg.includes('eacces') ||
+		msg.includes('requires root') ||
+		msg.includes('sudo') ||
+		msg.includes('access denied') ||
+		msg.includes('operation not permitted');
+}
+
+function formatActionError(action: string, name: string, err: unknown): string {
+	if (isPermissionError(err)) {
+		return `${action} ${name} failed: permission denied. Try running with elevated privileges (e.g. sudo).`;
+	}
+	return `${action} ${name} failed: ${err}`;
 }
 
 export function installPkg(manager: PackageManager, name: string): void {
@@ -217,6 +243,9 @@ export function installPkg(manager: PackageManager, name: string): void {
 		await loadPackagesForManager(manager);
 	}, {
 		successMessage: `Installed ${name}`,
+		onError: (e) => {
+			addToast(formatActionError('Install', name, e), 'error', 6000);
+		}
 	});
 }
 
@@ -230,6 +259,9 @@ export function uninstallPkg(manager: PackageManager, name: string): void {
 		await loadPackagesForManager(manager);
 	}, {
 		successMessage: `Uninstalled ${name}`,
+		onError: (e) => {
+			addToast(formatActionError('Uninstall', name, e), 'error', 6000);
+		}
 	});
 }
 
@@ -243,6 +275,9 @@ export function updatePkg(manager: PackageManager, name: string): void {
 		]);
 	}, {
 		successMessage: `Updated ${name}`,
+		onError: (e) => {
+			addToast(formatActionError('Update', name, e), 'error', 6000);
+		}
 	});
 }
 
@@ -331,6 +366,14 @@ export function setSearchQuery(query: string): void {
 
 export function getSearchResults(): Package[] {
 	return searchResults;
+}
+
+export function getSearchError(): string | null {
+	return searchError;
+}
+
+export function isLoadingSearch(): boolean {
+	return loadingSearch;
 }
 
 export function getActiveView(): ViewId {

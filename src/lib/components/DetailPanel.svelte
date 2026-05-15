@@ -82,7 +82,7 @@
 			class="flex items-center justify-between border-b px-4 py-3"
 			style="border-color: var(--border-subtle);"
 		>
-			<span class="text-[11px] font-medium uppercase tracking-wider" style="color: var(--text-muted);">
+			<span class="text-[10px] font-medium uppercase tracking-wider" style="color: var(--text-muted);">
 				Package Details
 			</span>
 			<div class="flex items-center gap-1">

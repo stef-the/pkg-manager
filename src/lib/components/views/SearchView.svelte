@@ -5,10 +5,12 @@
 	import {
 		searchRemotePackages,
 		getSearchResults,
-		isLoading,
+		getSearchError,
+		isLoadingSearch,
 		installPkg,
 		getAvailableManagers,
-		getAllPackages
+		getAllPackages,
+		setActiveView
 	} from '$lib/stores/packages.svelte';
 	import type { PackageManager, Package } from '$lib/types';
 
@@ -21,6 +23,12 @@
 		if (value.trim()) {
 			hasSearched = true;
 			searchRemotePackages(selectedManager, value);
+		}
+	}
+
+	function retrySearch() {
+		if (query.trim()) {
+			searchRemotePackages(selectedManager, query);
 		}
 	}
 
@@ -77,8 +85,24 @@
 
 	<!-- Results -->
 	<div class="flex-1 overflow-y-auto">
-		{#if isLoading()}
+		{#if getAvailableManagers().length === 0}
+			<EmptyState
+				variant="warning"
+				title="No package managers available"
+				message="Install a package manager to search for packages."
+				actionLabel="Go to Managers"
+				onaction={() => setActiveView('managers')}
+			/>
+		{:else if isLoadingSearch()}
 			<LoadingSkeleton />
+		{:else if getSearchError()}
+			<EmptyState
+				variant="error"
+				title="Search failed"
+				message={getSearchError() ?? 'A network or system error occurred. Check your connection and try again.'}
+				actionLabel="Retry"
+				onaction={retrySearch}
+			/>
 		{:else if getSearchResults().length > 0}
 			<div class="flex flex-col">
 				{#each getSearchResults() as pkg (pkg.manager + '/' + pkg.name)}
@@ -111,12 +135,8 @@
 							</span>
 						{:else}
 							<button
-								class="rounded-full px-3 py-1 text-[11px] font-semibold transition-colors duration-100"
+								class="rounded-full px-3 py-1 text-[11px] font-semibold transition-colors duration-100 hover:opacity-90"
 								style="background-color: var(--accent); color: var(--bg-primary);"
-								onmouseenter={(e) =>
-									(e.currentTarget.style.backgroundColor = 'var(--accent-hover)')}
-								onmouseleave={(e) =>
-									(e.currentTarget.style.backgroundColor = 'var(--accent)')}
 								onclick={() => installPkg(pkg.manager as PackageManager, pkg.name)}
 								>
 								Install
@@ -129,12 +149,12 @@
 			<EmptyState title="Search for packages" message="Enter a search term above" />
 		{:else if hasSearched}
 			<EmptyState
-								title="No results found"
+				title="No results found"
 				message={`No packages matching "${query}" in ${managerDisplayName(selectedManager)}`}
 			/>
 		{:else}
 			<EmptyState
-								title="Search for packages"
+				title="Search for packages"
 				message={`Find and install packages from ${managerDisplayName(selectedManager)}`}
 			/>
 		{/if}
