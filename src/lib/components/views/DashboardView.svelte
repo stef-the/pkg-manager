@@ -25,7 +25,7 @@
 
 	let localSearch = $state(getSearchQuery());
 	let hoveredSegment = $state<string | null>(null);
-	let storageData = $state<[string, string][]>([]);
+	let storageInfo = $state<{ diskTotal: string; diskUsed: string; diskPct: number } | null>(null);
 
 	function handleSearch(value: string) {
 		setSearchQuery(value);
@@ -106,22 +106,17 @@
 		}
 	}
 
-	// Load storage info (once — now instant, no du)
+	// Load storage info (once — instant, no du)
 	let storageLoaded = false;
 	$effect(() => {
 		if (storageLoaded) return;
 		storageLoaded = true;
 		if (typeof window !== 'undefined' && '__TAURI__' in window) {
-			invoke<[string, string][]>('get_storage_info')
-				.then((data) => { storageData = data; })
-				.catch(() => { storageData = []; });
+			invoke<{ diskTotal: string; diskUsed: string; diskPct: number }>('get_storage_info')
+				.then((data) => { storageInfo = data; })
+				.catch(() => {});
 		}
 	});
-
-	function storageFor(id: string): string | null {
-		const entry = storageData.find(([mgr]) => mgr === id);
-		return entry ? entry[1] : null;
-	}
 </script>
 
 <div class="flex h-full flex-col overflow-y-auto">
@@ -141,7 +136,7 @@
 		<div class="px-6 pt-4">
 			<LoadingSkeleton rows={3} />
 		</div>
-	{:else if getError()}
+	{:else if getError() && getTotalPackageCount() === 0}
 		<div class="px-6">
 			<EmptyState
 				variant="error"
@@ -149,16 +144,6 @@
 				message={getError() ?? 'An unknown error occurred. Check your connection and try again.'}
 				actionLabel="Retry"
 				onaction={refreshPackages}
-			/>
-		</div>
-	{:else if !isLoading() && getAvailableManagers().length === 0}
-		<div class="px-6">
-			<EmptyState
-				variant="warning"
-				title="No package managers found"
-				message="Install a package manager like Homebrew or npm to get started."
-				actionLabel="Go to Managers"
-				onaction={() => setActiveView('managers')}
 			/>
 		</div>
 	{/if}
@@ -192,10 +177,10 @@
 
 		<!-- Donut chart -->
 		<div
-			class="flex flex-col items-center gap-2 rounded-lg border px-4 py-3"
-			style="border-color: var(--border-subtle); background-color: var(--surface); min-width: 180px;"
+			class="flex flex-1 flex-col items-center justify-between gap-2 rounded-lg border px-4 py-3"
+			style="border-color: var(--border-subtle); background-color: var(--surface); min-width: 200px;"
 		>
-			<svg width="140" height="140" viewBox="0 0 120 120">
+			<svg class="flex-shrink-0" width="160" height="160" viewBox="0 0 120 120">
 				{#each donutSegments as seg}
 					<path
 						d={donutArc(seg.start, seg.end, 45, 60, 60)}
@@ -244,39 +229,27 @@
 			</div>
 		</div>
 
-		<!-- Storage info -->
+		<!-- Disk usage -->
 		<div
-			class="flex flex-1 flex-col gap-2 rounded-lg border px-4 py-3"
+			class="flex flex-1 flex-col justify-center gap-3 rounded-lg border px-4 py-3"
 			style="border-color: var(--border-subtle); background-color: var(--surface);"
 		>
 			<span class="text-[10px] font-medium uppercase tracking-wider" style="color: var(--text-muted);">Disk Usage</span>
-			{#if storageData.length > 0}
-				<div class="flex flex-col gap-1.5">
-					{#each storageData as [mgr, size]}
-						<div class="flex items-center gap-2">
-							<span class="flex w-4 items-center justify-center" style="color: var(--text-muted);">
-								<Icon name={managerIcon(mgr)} size={12} />
-							</span>
-							<span class="flex-1 text-[11px]" style="color: var(--text-secondary);">{managerDisplayName(mgr)}</span>
-							<span class="font-mono text-[12px] font-semibold" style="color: var(--text-primary);">{size}</span>
-						</div>
-					{/each}
+			{#if storageInfo}
+				<div class="flex items-baseline gap-1.5">
+					<span class="font-mono text-[20px] font-bold" style="color: var(--text-primary);">{storageInfo.diskUsed}</span>
+					<span class="text-[12px]" style="color: var(--text-muted);">/ {storageInfo.diskTotal}</span>
 				</div>
+				<div class="h-2 w-full overflow-hidden rounded-full" style="background-color: var(--bg-primary);">
+					<div
+						class="h-full rounded-full transition-all duration-500"
+						style={`width: ${storageInfo.diskPct}%; background-color: ${storageInfo.diskPct > 90 ? 'var(--error)' : storageInfo.diskPct > 70 ? 'var(--warning)' : 'var(--accent)'};`}
+					></div>
+				</div>
+				<span class="text-[10px]" style="color: var(--text-muted);">{storageInfo.diskPct}% used</span>
 			{:else}
-				<div class="flex flex-col gap-1.5">
-					{#each getAvailableManagers() as m}
-						{@const count = getManagerPackageCount(m.id)}
-						{#if count > 0}
-							<div class="flex items-center gap-2">
-								<span class="flex w-4 items-center justify-center" style="color: var(--text-muted);">
-									<Icon name={managerIcon(m.id)} size={12} />
-								</span>
-								<span class="flex-1 text-[11px]" style="color: var(--text-secondary);">{managerDisplayName(m.id)}</span>
-								<span class="font-mono text-[12px] font-semibold" style="color: var(--text-primary);">{count} pkgs</span>
-							</div>
-						{/if}
-					{/each}
-				</div>
+				<span class="font-mono text-[20px] font-bold" style="color: var(--text-primary);">{getTotalPackageCount()}</span>
+				<span class="text-[10px]" style="color: var(--text-muted);">total packages installed</span>
 			{/if}
 		</div>
 	</div>

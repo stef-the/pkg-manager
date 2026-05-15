@@ -371,87 +371,70 @@ pub fn open_url(url: String) -> Result<(), String> {
 }
 
 #[tauri::command]
-pub fn get_storage_info() -> Result<Vec<(String, String)>, String> {
+pub fn get_storage_info() -> Result<serde_json::Value, String> {
     log::info!("Command: get_storage_info");
-    let mut results: Vec<(String, String)> = Vec::new();
 
-    // Use fast methods — count entries + estimate instead of full du -sh
+    // Get total disk size and available space using df
+    let (disk_total, disk_available) = if let Ok(output) = run_command_allow_failure("df", &["-k", "/"]) {
+        // Parse df output: Filesystem 1K-blocks Used Available ...
+        let line = output.lines().nth(1).unwrap_or("");
+        let parts: Vec<&str> = line.split_whitespace().collect();
+        if parts.len() >= 4 {
+            let total_kb: u64 = parts[1].parse().unwrap_or(0);
+            let avail_kb: u64 = parts[3].parse().unwrap_or(0);
+            (total_kb * 1024, avail_kb * 1024)
+        } else {
+            (0u64, 0u64)
+        }
+    } else {
+        (0u64, 0u64)
+    };
 
-    // Homebrew: count Cellar entries (no du — it's too slow on large Cellars)
+    let disk_used = disk_total.saturating_sub(disk_available);
+
+    fn format_bytes(bytes: u64) -> String {
+        if bytes >= 1_000_000_000_000 {
+            format!("{:.1}TB", bytes as f64 / 1_000_000_000_000.0)
+        } else if bytes >= 1_000_000_000 {
+            format!("{:.1}GB", bytes as f64 / 1_000_000_000.0)
+        } else if bytes >= 1_000_000 {
+            format!("{:.0}MB", bytes as f64 / 1_000_000.0)
+        } else {
+            format!("{:.0}KB", bytes as f64 / 1_000.0)
+        }
+    }
+
+    // Count package entries (instant, no du)
+    let mut manager_counts: Vec<(String, usize)> = Vec::new();
+
     let cellar_paths = ["/opt/homebrew/Cellar", "/usr/local/Cellar"];
     for cellar in &cellar_paths {
-        let path = std::path::Path::new(cellar);
-        if path.exists() {
-            if let Ok(entries) = std::fs::read_dir(path) {
-                let count = entries.count();
-                results.push(("brew".to_string(), format!("{} formulae", count)));
-            }
-            break;
-        }
-    }
-    // Also count casks
-    let cask_paths = ["/opt/homebrew/Caskroom", "/usr/local/Caskroom"];
-    for caskroom in &cask_paths {
-        let path = std::path::Path::new(caskroom);
-        if path.exists() {
-            if let Ok(entries) = std::fs::read_dir(path) {
-                let count = entries.count();
-                if count > 0 {
-                    results.push(("brew-cask".to_string(), format!("{} casks", count)));
-                }
-            }
+        let p = std::path::Path::new(cellar);
+        if p.exists() {
+            if let Ok(e) = std::fs::read_dir(p) { manager_counts.push(("brew".to_string(), e.count())); }
             break;
         }
     }
 
-    // npm: just check the lib/node_modules folder size (usually small for globals)
     if let Ok(prefix) = run_command("npm", &["prefix", "-g"]) {
-        let nm_path = format!("{}/lib/node_modules", prefix.trim());
-        let path = std::path::Path::new(&nm_path);
-        if path.exists() {
-            if let Ok(entries) = std::fs::read_dir(path) {
-                let count = entries.count();
-                results.push(("npm".to_string(), format!("{} global pkgs", count)));
-            }
-        }
+        let nm = format!("{}/lib/node_modules", prefix.trim());
+        if let Ok(e) = std::fs::read_dir(&nm) { manager_counts.push(("npm".to_string(), e.count())); }
     }
 
-    // Cargo bin: count binaries (fast)
     if let Ok(home) = std::env::var("HOME") {
-        let cargo_bin = format!("{}/.cargo/bin", home);
-        let path = std::path::Path::new(&cargo_bin);
-        if path.exists() {
-            if let Ok(entries) = std::fs::read_dir(path) {
-                let count = entries.filter(|e| e.is_ok()).count();
-                results.push(("cargo".to_string(), format!("{} binaries", count)));
-            }
-        }
+        let cb = format!("{}/.cargo/bin", home);
+        if let Ok(e) = std::fs::read_dir(&cb) { manager_counts.push(("cargo".to_string(), e.filter(|x| x.is_ok()).count())); }
     }
 
-    // pip cache size (fast — pip caches this info)
-    let pip_cmd = if crate::adapters::command_exists("pip3") { "pip3" } else { "pip" };
-    if crate::adapters::command_exists(pip_cmd) {
-        if let Ok(output) = run_command_allow_failure(pip_cmd, &["cache", "info"]) {
-            for line in output.lines() {
-                if line.find("Location:").is_some() {
-                    // Skip location, look for size line
-                    continue;
-                }
-                if line.to_lowercase().contains("size") {
-                    if let Some(size_part) = line.split(':').nth(1) {
-                        let size = size_part.trim().to_string();
-                        if !size.is_empty() {
-                            results.push(("pip".to_string(), size));
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
+    log::info!("Storage: disk {}/ {}", format_bytes(disk_used), format_bytes(disk_total));
 
-    log::info!("Storage info: {:?}", results);
-    Ok(results)
+    Ok(serde_json::json!({
+        "diskTotal": format_bytes(disk_total),
+        "diskUsed": format_bytes(disk_used),
+        "diskAvailable": format_bytes(disk_available),
+        "diskPct": if disk_total > 0 { (disk_used as f64 / disk_total as f64 * 100.0).round() as u64 } else { 0 },
+        "managers": manager_counts.into_iter().map(|(m, c)| serde_json::json!({"id": m, "count": c})).collect::<Vec<_>>()
+    }))
 }
 
 #[tauri::command]

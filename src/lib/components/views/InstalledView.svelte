@@ -35,23 +35,15 @@
 
 	<!-- Package List -->
 	<div class="flex-1 overflow-y-auto">
-		{#if getError()}
+		{#if isLoading() && getFilteredPackages().length === 0}
+			<LoadingSkeleton />
+		{:else if getError() && getFilteredPackages().length === 0}
 			<EmptyState
 				variant="error"
 				title="Failed to load packages"
 				message={getError() ?? 'An unknown error occurred.'}
 				actionLabel="Retry"
 				onaction={refreshPackages}
-			/>
-		{:else if isLoading()}
-			<LoadingSkeleton />
-		{:else if !getSearchQuery() && getAvailableManagers().length === 0}
-			<EmptyState
-				variant="warning"
-				title="No package managers found"
-				message="Install a package manager like Homebrew or npm to see your installed packages."
-				actionLabel="Go to Managers"
-				onaction={() => setActiveView('managers')}
 			/>
 		{:else}
 			<PackageList
