@@ -112,8 +112,14 @@
 		if (storageLoaded) return;
 		storageLoaded = true;
 		if (typeof window !== 'undefined' && '__TAURI__' in window) {
-			invoke<{ diskTotal: string; diskUsed: string; diskPct: number }>('get_storage_info')
-				.then((data) => { storageInfo = data; })
+			invoke<unknown>('get_storage_info')
+				.then((data) => {
+					// New format: { diskTotal, diskUsed, diskPct, managers }
+					if (data && typeof data === 'object' && 'diskTotal' in data) {
+						storageInfo = data as { diskTotal: string; diskUsed: string; diskPct: number };
+					}
+					// Old format or unexpected: just ignore, fallback shows package count
+				})
 				.catch(() => {});
 		}
 	});
