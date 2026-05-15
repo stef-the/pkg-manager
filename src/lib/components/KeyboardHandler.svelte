@@ -7,17 +7,7 @@
 	function handleKeydown(e: KeyboardEvent) {
 		const meta = e.metaKey || e.ctrlKey;
 
-		// Cmd/Ctrl+K — focus search
-		if (meta && e.key === 'k') {
-			e.preventDefault();
-			setActiveView('search');
-			// Focus the search input after view switch
-			requestAnimationFrame(() => {
-				const input = document.querySelector<HTMLInputElement>('input[type="text"][placeholder*="Search"]');
-				input?.focus();
-			});
-			return;
-		}
+		// Cmd+K handled by CommandPalette in layout
 
 		// Cmd/Ctrl+number — switch views
 		if (meta && e.key >= '1' && e.key <= '9') {

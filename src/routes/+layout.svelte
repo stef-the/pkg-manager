@@ -6,6 +6,20 @@
 	import ErrorBoundary from '$lib/components/ErrorBoundary.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 	import KeyboardHandler from '$lib/components/KeyboardHandler.svelte';
+	import CommandPalette from '$lib/components/CommandPalette.svelte';
+
+	let paletteOpen = $state(false);
+
+	$effect(() => {
+		function handleKey(e: KeyboardEvent) {
+			if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+				e.preventDefault();
+				paletteOpen = !paletteOpen;
+			}
+		}
+		window.addEventListener('keydown', handleKey);
+		return () => window.removeEventListener('keydown', handleKey);
+	});
 	import { initTheme, getEffectiveTheme, applyThemeToDocument } from '$lib/stores/theme.svelte';
 	import { setActiveView, refreshPackages } from '$lib/stores/packages.svelte';
 
@@ -46,4 +60,5 @@
 	</div>
 	<Toast />
 	<KeyboardHandler />
+	<CommandPalette bind:open={paletteOpen} />
 </ErrorBoundary>

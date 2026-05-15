@@ -377,20 +377,27 @@ pub fn get_storage_info() -> Result<Vec<(String, String)>, String> {
 
     // Use fast methods — count entries + estimate instead of full du -sh
 
-    // Homebrew: count Cellar entries (each is ~50-200MB average)
+    // Homebrew: count Cellar entries (no du — it's too slow on large Cellars)
     let cellar_paths = ["/opt/homebrew/Cellar", "/usr/local/Cellar"];
     for cellar in &cellar_paths {
         let path = std::path::Path::new(cellar);
         if path.exists() {
             if let Ok(entries) = std::fs::read_dir(path) {
                 let count = entries.count();
-                // Quick du on just the top level with max-depth=0
-                if let Ok(output) = run_command_allow_failure("du", &["-sh", cellar]) {
-                    if let Some(size) = output.split_whitespace().next() {
-                        results.push(("brew".to_string(), size.to_string()));
-                    }
-                } else {
-                    results.push(("brew".to_string(), format!("~{} formulae", count)));
+                results.push(("brew".to_string(), format!("{} formulae", count)));
+            }
+            break;
+        }
+    }
+    // Also count casks
+    let cask_paths = ["/opt/homebrew/Caskroom", "/usr/local/Caskroom"];
+    for caskroom in &cask_paths {
+        let path = std::path::Path::new(caskroom);
+        if path.exists() {
+            if let Ok(entries) = std::fs::read_dir(path) {
+                let count = entries.count();
+                if count > 0 {
+                    results.push(("brew-cask".to_string(), format!("{} casks", count)));
                 }
             }
             break;

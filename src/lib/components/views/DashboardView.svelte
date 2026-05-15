@@ -106,35 +106,15 @@
 		}
 	}
 
-	// Load storage info (once, with timeout)
+	// Load storage info (once — now instant, no du)
 	let storageLoaded = false;
 	$effect(() => {
 		if (storageLoaded) return;
 		storageLoaded = true;
 		if (typeof window !== 'undefined' && '__TAURI__' in window) {
-			const timeout = setTimeout(() => {
-				// If still empty after 5s, show package counts as fallback
-				if (storageData.length === 0) {
-					storageData = getAvailableManagers().map((m) => [
-						m.id,
-						`${getManagerPackageCount(m.id)} packages`
-					] as [string, string]).filter(([_, v]) => !v.startsWith('0'));
-				}
-			}, 5000);
 			invoke<[string, string][]>('get_storage_info')
-				.then((data) => {
-					clearTimeout(timeout);
-					storageData = data.length > 0 ? data : getAvailableManagers().map((m) => [
-						m.id,
-						`${getManagerPackageCount(m.id)} packages`
-					] as [string, string]).filter(([_, v]) => !v.startsWith('0'));
-				})
-				.catch(() => {
-					clearTimeout(timeout);
-					storageData = [];
-				});
-		} else {
-			storageData = [];
+				.then((data) => { storageData = data; })
+				.catch(() => { storageData = []; });
 		}
 	});
 
@@ -283,8 +263,19 @@
 					{/each}
 				</div>
 			{:else}
-				<div class="flex flex-1 items-center justify-center">
-					<span class="text-[11px]" style="color: var(--text-muted);">Calculating...</span>
+				<div class="flex flex-col gap-1.5">
+					{#each getAvailableManagers() as m}
+						{@const count = getManagerPackageCount(m.id)}
+						{#if count > 0}
+							<div class="flex items-center gap-2">
+								<span class="flex w-4 items-center justify-center" style="color: var(--text-muted);">
+									<Icon name={managerIcon(m.id)} size={12} />
+								</span>
+								<span class="flex-1 text-[11px]" style="color: var(--text-secondary);">{managerDisplayName(m.id)}</span>
+								<span class="font-mono text-[12px] font-semibold" style="color: var(--text-primary);">{count} pkgs</span>
+							</div>
+						{/if}
+					{/each}
 				</div>
 			{/if}
 		</div>
