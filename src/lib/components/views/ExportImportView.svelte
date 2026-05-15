@@ -30,7 +30,7 @@
 </script>
 
 <div class="flex h-full flex-col">
-	<div class="flex flex-col gap-4 border-b px-6 py-5" style="border-color: var(--border-subtle);">
+	<div class="flex flex-col gap-4 border-b px-6 py-4" style="border-color: var(--border-subtle);">
 		<h1 class="text-lg font-semibold" style="color: var(--text-primary);">Export / Import</h1>
 		<p class="text-[13px]" style="color: var(--text-muted);">
 			Export your installed packages to a file, or import a list to bulk-install.
@@ -40,7 +40,7 @@
 	<div class="flex flex-1 flex-col gap-6 overflow-y-auto px-6 py-5">
 		<!-- Export -->
 		<div class="flex flex-col gap-3">
-			<span class="text-[11px] font-medium uppercase tracking-wider" style="color: var(--text-muted);">
+			<span class="text-[10px] font-medium uppercase tracking-wider" style="color: var(--text-muted);">
 				Export
 			</span>
 			<p class="text-[12px]" style="color: var(--text-secondary);">
@@ -57,7 +57,7 @@
 
 		<!-- Import -->
 		<div class="flex flex-col gap-3">
-			<span class="text-[11px] font-medium uppercase tracking-wider" style="color: var(--text-muted);">
+			<span class="text-[10px] font-medium uppercase tracking-wider" style="color: var(--text-muted);">
 				Import
 			</span>
 			<p class="text-[12px]" style="color: var(--text-secondary);">

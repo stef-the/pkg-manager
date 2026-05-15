@@ -68,12 +68,25 @@
 
 	<div class="flex-1 overflow-y-auto p-6">
 		{#if loading}
-			<span class="text-[13px]" style="color: var(--text-muted);">Loading logs...</span>
+			<LoadingSkeleton rows={12} />
+		{:else if loadError}
+			<EmptyState
+				variant="error"
+				title="Failed to load logs"
+				message={loadError}
+				actionLabel="Retry"
+				onaction={loadLogs}
+			/>
+		{:else if !logContent}
+			<EmptyState
+				title="No logs available"
+				message="Application logs will appear here once there is activity."
+			/>
 		{:else}
 			<pre
 				class="h-full overflow-auto rounded-lg p-4 font-mono text-[11px] leading-relaxed"
 				style="background-color: var(--bg-primary); color: var(--text-secondary);"
-			>{logContent || 'No logs available.'}</pre>
+			>{logContent}</pre>
 		{/if}
 	</div>
 </div>

@@ -174,7 +174,7 @@
 		<!-- Date Slider -->
 		<div class="flex flex-col gap-3">
 			<div class="flex items-center justify-between">
-				<span class="text-[11px] font-medium uppercase tracking-wider" style="color: var(--text-muted);">
+				<span class="text-[10px] font-medium uppercase tracking-wider" style="color: var(--text-muted);">
 					Not used since
 				</span>
 				<div class="relative">
@@ -287,7 +287,7 @@
 		<!-- Package Selection -->
 		<div class="flex flex-col gap-3">
 			<div class="flex items-center justify-between">
-				<span class="text-[11px] font-medium uppercase tracking-wider" style="color: var(--text-muted);">
+				<span class="text-[10px] font-medium uppercase tracking-wider" style="color: var(--text-muted);">
 					Candidates ({candidatePackages.length})
 				</span>
 				<div class="flex gap-2">

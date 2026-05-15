@@ -1,5 +1,8 @@
 <script lang="ts">
-	import { getManagers, loadAllPackages } from '$lib/stores/packages.svelte';
+	import { getManagers, loadAllPackages, isLoading } from '$lib/stores/packages.svelte';
+	import LoadingSkeleton from '$lib/components/LoadingSkeleton.svelte';
+	import EmptyState from '$lib/components/EmptyState.svelte';
+	import { addToast } from '$lib/stores/toast.svelte';
 	import { runTask } from '$lib/stores/tasks.svelte';
 	import Icon from '$lib/components/Icons.svelte';
 	import type { IconName } from '$lib/components/Icons.svelte';
@@ -8,7 +11,13 @@
 	function autoInstall(id: string, name: string) {
 		runTask(`Installing ${name}`, () => invoke<string>('install_manager', { manager: id }), {
 			successMessage: `${name} installed successfully`,
-			onSuccess: () => loadAllPackages(true)
+			onSuccess: () => loadAllPackages(true),
+			onError: (e) => {
+				const msg = `${e}`.toLowerCase();
+				if (msg.includes('permission') || msg.includes('sudo') || msg.includes('eacces')) {
+					addToast(`Installing ${name} failed: permission denied. Try running with elevated privileges.`, 'error', 6000);
+				}
+			}
 		});
 	}
 
@@ -51,6 +60,9 @@
 	</div>
 
 	<div class="flex flex-1 flex-col gap-3 overflow-y-auto px-6 py-5">
+		{#if isLoading() && getManagers().length === 0}
+			<LoadingSkeleton rows={5} />
+		{/if}
 		{#each knownManagers as id}
 			{@const meta = managerMeta(id)}
 			{@const detected = detectedManagers.find((m) => m.id === id)}
