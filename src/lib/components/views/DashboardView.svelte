@@ -25,7 +25,9 @@
 
 	let localSearch = $state(getSearchQuery());
 	let hoveredSegment = $state<string | null>(null);
-	let storageInfo = $state<{ diskTotal: string; diskUsed: string; diskPct: number } | null>(null);
+
+	interface StorageInfo { diskTotal: string; diskUsed: string; diskAvailable: string; diskPct: number; }
+	let storageInfo = $state<StorageInfo | null>(null);
 
 	function handleSearch(value: string) {
 		setSearchQuery(value);
@@ -112,20 +114,9 @@
 		if (storageLoaded) return;
 		storageLoaded = true;
 		if (typeof window !== 'undefined' && '__TAURI__' in window) {
-			invoke<Record<string, unknown>>('get_storage_info')
-				.then((data) => {
-					console.log('Storage info response:', data);
-					if (data && typeof data.diskTotal === 'string' && typeof data.diskUsed === 'string') {
-						storageInfo = {
-							diskTotal: data.diskTotal as string,
-							diskUsed: data.diskUsed as string,
-							diskPct: (data.diskPct as number) ?? 0
-						};
-					}
-				})
-				.catch((e) => {
-					console.error('Storage info failed:', e);
-				});
+			invoke<StorageInfo>('get_storage_info')
+				.then((data) => { storageInfo = data; })
+				.catch(() => {});
 		}
 	});
 </script>
@@ -143,11 +134,7 @@
 		</div>
 	</div>
 
-	{#if isLoading() && getTotalPackageCount() === 0}
-		<div class="px-6 pt-4">
-			<LoadingSkeleton rows={3} />
-		</div>
-	{:else if getError() && getTotalPackageCount() === 0}
+	{#if getError() && getTotalPackageCount() === 0}
 		<div class="px-6">
 			<EmptyState
 				variant="error"
@@ -274,11 +261,20 @@
 
 	<!-- Package List -->
 	<div class="min-h-0 flex-1">
-		{#if isLoading()}
+		{#if getFilteredPackages().length > 0}
+			<PackageList
+				packages={getFilteredPackages()}
+				emptyTitle={getSearchQuery() ? 'No matching packages' : 'No packages loaded'}
+				emptyMessage={getSearchQuery() ? 'Try a different search term' : ''}
+			/>
+			{#if isLoading()}
+				<LoadingSkeleton rows={3} />
+			{/if}
+		{:else if isLoading()}
 			<LoadingSkeleton />
 		{:else}
 			<PackageList
-				packages={getFilteredPackages()}
+				packages={[]}
 				emptyTitle={getSearchQuery() ? 'No matching packages' : 'No packages loaded'}
 				emptyMessage={getSearchQuery() ? 'Try a different search term' : 'Packages will appear here once loaded'}
 			/>

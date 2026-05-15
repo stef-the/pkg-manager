@@ -371,28 +371,26 @@ pub fn open_url(url: String) -> Result<(), String> {
 }
 
 #[tauri::command]
-pub fn get_storage_info() -> Result<serde_json::Value, String> {
+pub fn get_storage_info() -> Result<crate::models::StorageInfo, String> {
     log::info!("Command: get_storage_info");
 
-    // Get total disk size and available space using df
-    let (disk_total, disk_available) = if let Ok(output) = run_command_allow_failure("df", &["-k", "/"]) {
-        // Parse df output: Filesystem 1K-blocks Used Available ...
-        let line = output.lines().nth(1).unwrap_or("");
-        let parts: Vec<&str> = line.split_whitespace().collect();
-        if parts.len() >= 4 {
-            let total_kb: u64 = parts[1].parse().unwrap_or(0);
-            let avail_kb: u64 = parts[3].parse().unwrap_or(0);
-            (total_kb * 1024, avail_kb * 1024)
-        } else {
-            (0u64, 0u64)
-        }
-    } else {
-        (0u64, 0u64)
-    };
+    let output = run_command_allow_failure("df", &["-k", "/"])
+        .map_err(|e| format!("df failed: {}", e))?;
 
-    let disk_used = disk_total.saturating_sub(disk_available);
+    let line = output.lines().nth(1).unwrap_or("");
+    let parts: Vec<&str> = line.split_whitespace().collect();
 
-    fn format_bytes(bytes: u64) -> String {
+    if parts.len() < 4 {
+        return Err("Could not parse df output".to_string());
+    }
+
+    let total_kb: u64 = parts[1].parse().unwrap_or(0);
+    let avail_kb: u64 = parts[3].parse().unwrap_or(0);
+    let total = total_kb * 1024;
+    let available = avail_kb * 1024;
+    let used = total.saturating_sub(available);
+
+    fn fmt(bytes: u64) -> String {
         if bytes >= 1_000_000_000_000 {
             format!("{:.1}TB", bytes as f64 / 1_000_000_000_000.0)
         } else if bytes >= 1_000_000_000 {
@@ -404,14 +402,15 @@ pub fn get_storage_info() -> Result<serde_json::Value, String> {
         }
     }
 
-    log::info!("Storage: disk {} / {}", format_bytes(disk_used), format_bytes(disk_total));
+    let pct = if total > 0 { (used as f64 / total as f64 * 100.0).round() as u64 } else { 0 };
+    log::info!("Storage: {} / {} ({}%)", fmt(used), fmt(total), pct);
 
-    Ok(serde_json::json!({
-        "diskTotal": format_bytes(disk_total),
-        "diskUsed": format_bytes(disk_used),
-        "diskAvailable": format_bytes(disk_available),
-        "diskPct": if disk_total > 0 { (disk_used as f64 / disk_total as f64 * 100.0).round() as u64 } else { 0 }
-    }))
+    Ok(crate::models::StorageInfo {
+        disk_total: fmt(total),
+        disk_used: fmt(used),
+        disk_available: fmt(available),
+        disk_pct: pct,
+    })
 }
 
 #[tauri::command]

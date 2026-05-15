@@ -42,6 +42,15 @@ pub struct PackageDetail {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct StorageInfo {
+    pub disk_total: String,
+    pub disk_used: String,
+    pub disk_available: String,
+    pub disk_pct: u64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SystemStats {
     pub os: String,
     pub arch: String,
