@@ -57,7 +57,7 @@
 
 <div class="flex h-full flex-col">
 	<!-- Header -->
-	<div class="flex flex-col gap-4 border-b px-6 py-5" style="border-color: var(--border-subtle);">
+	<div class="flex flex-col gap-4 border-b px-6 py-4" style="border-color: var(--border-subtle);">
 		<h1 class="text-lg font-semibold" style="color: var(--text-primary);">Search Packages</h1>
 
 		<!-- Manager Tabs -->

@@ -52,7 +52,7 @@
 </script>
 
 <div class="flex h-full flex-col">
-	<div class="flex flex-col gap-1 border-b px-6 py-5" style="border-color: var(--border-subtle);">
+	<div class="flex flex-col gap-1 border-b px-6 py-4" style="border-color: var(--border-subtle);">
 		<h1 class="text-lg font-semibold" style="color: var(--text-primary);">Package Managers</h1>
 		<p class="text-[13px]" style="color: var(--text-muted);">
 			Manage and discover package managers on your system.
@@ -78,7 +78,7 @@
 
 				<div class="min-w-0 flex-1">
 					<div class="flex items-center gap-2">
-						<span class="text-[14px] font-semibold" style="color: var(--text-primary);">{meta.name}</span>
+						<span class="text-[13px] font-semibold" style="color: var(--text-primary);">{meta.name}</span>
 						{#if available}
 							<span class="rounded-full px-2 py-0.5 text-[10px] font-semibold" style="background-color: var(--success); color: var(--color-nord0);">
 								Installed
@@ -98,7 +98,7 @@
 				{#if !available}
 					<div class="flex flex-shrink-0 gap-2">
 						<button
-							class="rounded-lg px-4 py-2 text-[12px] font-medium transition-colors duration-100 hover:opacity-90"
+							class="rounded-lg px-4 py-2 text-[13px] font-medium transition-colors duration-100 hover:opacity-90"
 							style="background-color: var(--accent); color: var(--bg-primary);"
 							onclick={() => autoInstall(id, meta.name)}
 						>
@@ -106,7 +106,7 @@
 						</button>
 						{#if meta.installUrl}
 							<button
-								class="rounded-lg border px-3 py-2 text-[12px] font-medium transition-colors duration-100 hover:bg-[var(--bg-hover)]"
+								class="rounded-lg border px-4 py-2 text-[13px] font-medium transition-colors duration-100 hover:bg-[var(--bg-hover)]"
 								style="border-color: var(--border); color: var(--text-secondary);"
 								onclick={() => invoke('open_url', { url: meta.installUrl })}
 							>

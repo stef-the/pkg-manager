@@ -106,15 +106,33 @@
 		}
 	}
 
-	// Load storage info (once)
+	// Load storage info (once, with timeout)
 	let storageLoaded = false;
 	$effect(() => {
 		if (storageLoaded) return;
 		storageLoaded = true;
 		if (typeof window !== 'undefined' && '__TAURI__' in window) {
+			const timeout = setTimeout(() => {
+				// If still empty after 5s, show package counts as fallback
+				if (storageData.length === 0) {
+					storageData = getAvailableManagers().map((m) => [
+						m.id,
+						`${getManagerPackageCount(m.id)} packages`
+					] as [string, string]).filter(([_, v]) => !v.startsWith('0'));
+				}
+			}, 5000);
 			invoke<[string, string][]>('get_storage_info')
-				.then((data) => { storageData = data; })
-				.catch(() => { storageData = []; });
+				.then((data) => {
+					clearTimeout(timeout);
+					storageData = data.length > 0 ? data : getAvailableManagers().map((m) => [
+						m.id,
+						`${getManagerPackageCount(m.id)} packages`
+					] as [string, string]).filter(([_, v]) => !v.startsWith('0'));
+				})
+				.catch(() => {
+					clearTimeout(timeout);
+					storageData = [];
+				});
 		} else {
 			storageData = [];
 		}
@@ -139,7 +157,11 @@
 		</div>
 	</div>
 
-	{#if getError()}
+	{#if isLoading() && getTotalPackageCount() === 0}
+		<div class="px-6 pt-4">
+			<LoadingSkeleton rows={3} />
+		</div>
+	{:else if getError()}
 		<div class="px-6">
 			<EmptyState
 				variant="error"
@@ -193,7 +215,7 @@
 			class="flex flex-col items-center gap-2 rounded-lg border px-4 py-3"
 			style="border-color: var(--border-subtle); background-color: var(--surface); min-width: 180px;"
 		>
-			<svg width="110" height="110" viewBox="0 0 120 120">
+			<svg width="140" height="140" viewBox="0 0 120 120">
 				{#each donutSegments as seg}
 					<path
 						d={donutArc(seg.start, seg.end, 45, 60, 60)}
@@ -269,7 +291,7 @@
 	</div>
 
 	<!-- Search -->
-	<div class="px-6 pt-4">
+	<div class="px-6 pt-4 pb-2">
 		<SearchBar bind:value={localSearch} oninput={handleSearch} />
 	</div>
 

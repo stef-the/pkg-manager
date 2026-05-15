@@ -243,6 +243,7 @@ export function installPkg(manager: PackageManager, name: string): void {
 		await loadPackagesForManager(manager);
 	}, {
 		successMessage: `Installed ${name}`,
+		suppressErrorToast: true,
 		onError: (e) => {
 			addToast(formatActionError('Install', name, e), 'error', 6000);
 		}
@@ -259,6 +260,7 @@ export function uninstallPkg(manager: PackageManager, name: string): void {
 		await loadPackagesForManager(manager);
 	}, {
 		successMessage: `Uninstalled ${name}`,
+		suppressErrorToast: true,
 		onError: (e) => {
 			addToast(formatActionError('Uninstall', name, e), 'error', 6000);
 		}
@@ -275,6 +277,7 @@ export function updatePkg(manager: PackageManager, name: string): void {
 		]);
 	}, {
 		successMessage: `Updated ${name}`,
+		suppressErrorToast: true,
 		onError: (e) => {
 			addToast(formatActionError('Update', name, e), 'error', 6000);
 		}

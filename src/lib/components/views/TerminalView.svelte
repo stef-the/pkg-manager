@@ -55,7 +55,7 @@
 </script>
 
 <div class="flex h-full flex-col">
-	<div class="flex flex-col gap-4 border-b px-6 py-5" style="border-color: var(--border-subtle);">
+	<div class="flex flex-col gap-4 border-b px-6 py-4" style="border-color: var(--border-subtle);">
 		<h1 class="text-lg font-semibold" style="color: var(--text-primary);">Terminal</h1>
 		<p class="text-[13px]" style="color: var(--text-muted);">
 			Run package manager commands directly.
@@ -129,7 +129,7 @@
 			</div>
 
 			<button
-				class="rounded-lg px-3 py-1.5 text-[12px] font-medium transition-colors duration-100 hover:opacity-90"
+				class="rounded-lg px-4 py-2 text-[13px] font-medium transition-colors duration-100 hover:opacity-90"
 				style="background-color: var(--accent); color: var(--bg-primary);"
 				onclick={runCommand}
 				disabled={running || !command.trim()}

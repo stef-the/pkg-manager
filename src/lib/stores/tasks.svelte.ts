@@ -36,6 +36,7 @@ export function runTask<T>(
 		onError?: (error: unknown) => void;
 		successMessage?: string;
 		errorMessage?: string;
+		suppressErrorToast?: boolean;
 	}
 ): string {
 	const id = generateId();
@@ -71,7 +72,9 @@ export function runTask<T>(
 			const msg = `${error}`;
 			updateTask(id, { status: 'error', error: msg });
 			log.error(`Task failed: ${label} (${id}): ${msg}`);
-			addToast(options?.errorMessage ?? `${label} failed: ${msg}`, 'error');
+			if (!options?.suppressErrorToast) {
+				addToast(options?.errorMessage ?? `${label} failed: ${msg}`, 'error');
+			}
 			options?.onError?.(error);
 			setTimeout(() => removeTask(id), 5000);
 		});

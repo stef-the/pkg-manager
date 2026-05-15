@@ -61,6 +61,10 @@ pub fn run() {
             commands::append_history,
             commands::read_history,
             commands::send_notification,
+            commands::set_window_title,
+            commands::set_tray_tooltip,
+            commands::save_window_state,
+            commands::load_window_state,
         ])
         .setup(|app| {
             log::info!("Pkg Manager starting up");
@@ -68,27 +72,37 @@ pub fn run() {
             // Build tray menu
             let show_item =
                 MenuItem::with_id(app, "show", "Show Pkg Manager", true, None::<&str>)?;
+            let refresh_item =
+                MenuItem::with_id(app, "refresh", "Refresh Packages", true, None::<&str>)?;
+            let outdated_item =
+                MenuItem::with_id(app, "outdated", "Check Outdated", true, None::<&str>)?;
             let quit_item = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
-            let menu = Menu::with_items(app, &[&show_item, &quit_item])?;
+            let menu = Menu::with_items(app, &[&show_item, &refresh_item, &outdated_item, &quit_item])?;
 
             // Build tray icon
-            let _tray = TrayIconBuilder::new()
+            let _tray = TrayIconBuilder::with_id("main")
                 .icon(app.default_window_icon().unwrap().clone())
                 .icon_as_template(true)
                 .menu(&menu)
-                .on_menu_event(|app, event| match event.id.as_ref() {
-                    "quit" => {
-                        log::info!("Quit requested from tray");
-                        app.exit(0);
-                    }
-                    "show" => {
-                        log::info!("Show requested from tray");
-                        if let Some(window) = app.get_webview_window("main") {
-                            let _ = window.show();
-                            let _ = window.set_focus();
+                .tooltip("Pkg Manager")
+                .on_menu_event(|app, event| {
+                    match event.id.as_ref() {
+                        "quit" => {
+                            log::info!("Quit requested from tray");
+                            app.exit(0);
                         }
+                        "show" | "refresh" | "outdated" => {
+                            log::info!("{} requested from tray", event.id.as_ref());
+                            if let Some(window) = app.get_webview_window("main") {
+                                let _ = window.show();
+                                let _ = window.set_focus();
+                                // Emit event so frontend can handle the action
+                                use tauri::Emitter;
+                                let _ = app.emit("tray-action", event.id.as_ref());
+                            }
+                        }
+                        _ => {}
                     }
-                    _ => {}
                 })
                 .on_tray_icon_event(|tray, event| {
                     if let tauri::tray::TrayIconEvent::Click {

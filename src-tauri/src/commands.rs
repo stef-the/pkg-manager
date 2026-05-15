@@ -587,6 +587,45 @@ pub fn send_notification(app_handle: tauri::AppHandle, title: String, body: Stri
     Ok(())
 }
 
+// --- Window/Tray ---
+
+#[tauri::command]
+pub fn set_window_title(app_handle: tauri::AppHandle, title: String) -> Result<(), String> {
+    if let Some(window) = app_handle.get_webview_window("main") {
+        window.set_title(&title).map_err(|e| e.to_string())?;
+    }
+    Ok(())
+}
+
+#[tauri::command]
+pub fn set_tray_tooltip(app_handle: tauri::AppHandle, tooltip: String) -> Result<(), String> {
+    if let Some(tray) = app_handle.tray_by_id("main") {
+        tray.set_tooltip(Some(&tooltip)).map_err(|e| e.to_string())?;
+    }
+    Ok(())
+}
+
+#[tauri::command]
+pub fn save_window_state(app_handle: tauri::AppHandle, state: String) -> Result<(), String> {
+    let config_dir = app_handle.path().app_config_dir()
+        .map_err(|e| format!("Failed to get config dir: {}", e))?;
+    std::fs::create_dir_all(&config_dir).map_err(|e| e.to_string())?;
+    let path = config_dir.join("window-state.json");
+    std::fs::write(&path, &state).map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+#[tauri::command]
+pub fn load_window_state(app_handle: tauri::AppHandle) -> Result<String, String> {
+    let config_dir = app_handle.path().app_config_dir()
+        .map_err(|e| format!("Failed to get config dir: {}", e))?;
+    let path = config_dir.join("window-state.json");
+    if !path.exists() {
+        return Err("No saved state".to_string());
+    }
+    std::fs::read_to_string(&path).map_err(|e| e.to_string())
+}
+
 #[tauri::command]
 pub fn get_system_stats() -> SystemStats {
     log::info!("Command: get_system_stats");

@@ -7,15 +7,25 @@
 	import Toast from '$lib/components/Toast.svelte';
 	import KeyboardHandler from '$lib/components/KeyboardHandler.svelte';
 	import { initTheme, getEffectiveTheme, applyThemeToDocument } from '$lib/stores/theme.svelte';
+	import { setActiveView, refreshPackages } from '$lib/stores/packages.svelte';
 
 	let { children } = $props();
 
 	$effect(() => {
 		initTheme();
+
+		// Listen for tray menu actions
+		if (typeof window !== 'undefined' && '__TAURI__' in window) {
+			import('@tauri-apps/api/event').then(({ listen }) => {
+				listen<string>('tray-action', (event) => {
+					if (event.payload === 'refresh') refreshPackages();
+					if (event.payload === 'outdated') setActiveView('outdated');
+				});
+			});
+		}
 	});
 
 	$effect(() => {
-		// Re-run whenever effective theme changes
 		const _theme = getEffectiveTheme();
 		applyThemeToDocument();
 	});

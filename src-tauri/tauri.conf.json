@@ -1,6 +1,6 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "pkg-manager",
+  "productName": "Pkg Manager",
   "version": "0.1.0",
   "identifier": "com.pkg-manager.app",
   "build": {

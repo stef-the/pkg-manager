@@ -23,10 +23,10 @@
 
 <div class="flex h-full flex-col">
 	<!-- Header -->
-	<div class="flex flex-col gap-4 border-b px-6 py-5" style="border-color: var(--border-subtle);">
+	<div class="flex flex-col gap-4 border-b px-6 py-4" style="border-color: var(--border-subtle);">
 		<div class="flex items-center justify-between">
 			<h1 class="text-lg font-semibold" style="color: var(--text-primary);">Installed Packages</h1>
-			<span class="text-sm" style="color: var(--text-muted);">
+			<span class="text-[12px]" style="color: var(--text-muted);">
 				{getFilteredPackages().length} packages
 			</span>
 		</div>

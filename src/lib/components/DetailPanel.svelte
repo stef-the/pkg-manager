@@ -18,12 +18,15 @@
 	import { getDateFormat } from '$lib/stores/theme.svelte';
 	import PackageInfoModal from '$lib/components/PackageInfoModal.svelte';
 	import { isPinned, togglePin } from '$lib/stores/pinned.svelte';
+	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 	import { invoke } from '@tauri-apps/api/core';
 	import type { PackageManager } from '$lib/types';
 
 	let infoModalOpen = $state(false);
 	let infoModalManager = $state('');
 	let infoModalName = $state('');
+	let confirmUninstall = $state(false);
+	let uninstallTarget = $state<{ manager: PackageManager; name: string } | null>(null);
 
 	function managerDisplayName(id: string): string {
 		switch (id) {
@@ -210,7 +213,10 @@
 			<button
 				class="w-full rounded-lg border px-3 py-2 text-[13px] font-medium transition-colors duration-100 hover:bg-[var(--error)] hover:text-[var(--bg-primary)]"
 				style="border-color: var(--error); color: var(--error);"
-				onclick={() => uninstallPkg(pkg.manager as PackageManager, pkg.name)}
+				onclick={() => {
+					uninstallTarget = { manager: pkg.manager as PackageManager, name: pkg.name };
+					confirmUninstall = true;
+				}}
 				disabled={busy}
 			>
 				Uninstall
@@ -222,7 +228,7 @@
 			class="flex items-center border-b px-4 py-3"
 			style="border-color: var(--border-subtle);"
 		>
-			<span class="text-[11px] font-medium uppercase tracking-wider" style="color: var(--text-muted);">
+			<span class="text-[10px] font-medium uppercase tracking-wider" style="color: var(--text-muted);">
 				System
 			</span>
 		</div>
@@ -400,4 +406,18 @@
 	bind:open={infoModalOpen}
 	manager={infoModalManager}
 	packageName={infoModalName}
+/>
+
+<ConfirmDialog
+	bind:open={confirmUninstall}
+	title="Uninstall {uninstallTarget?.name ?? ''}?"
+	message="This will remove the package from your system. This action cannot be undone."
+	confirmLabel="Uninstall"
+	variant="danger"
+	onconfirm={() => {
+		if (uninstallTarget) {
+			uninstallPkg(uninstallTarget.manager, uninstallTarget.name);
+			uninstallTarget = null;
+		}
+	}}
 />

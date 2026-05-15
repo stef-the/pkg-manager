@@ -132,9 +132,9 @@
 		<rect x="2" y="8.5" width="5.5" height="5.5" rx="0.5" fill="currentColor" stroke="none" />
 		<rect x="8.5" y="8.5" width="5.5" height="5.5" rx="0.5" fill="currentColor" stroke="none" />
 	{:else if name === 'mas'}
-		<!-- Apple / App Store -->
-		<circle cx="8" cy="8" r="6" fill="currentColor" stroke="none" />
-		<text x="8" y="11" text-anchor="middle" font-size="8" font-weight="bold" fill="var(--bg-secondary)" font-family="system-ui">A</text>
+		<!-- Apple logo -->
+		<path d="M8.4 3.2c.5-.6 1.2-1 1.9-1.1-.1.7-.3 1.4-.8 1.9-.5.6-1.1.9-1.8 1 .1-.7.3-1.3.7-1.8z" fill="currentColor" stroke="none" />
+		<path d="M10.3 5.1c-1-.1-1.9.6-2.4.6s-1.2-.5-2-.5c-1 0-2 .6-2.5 1.5-1.1 1.9-.3 4.6.8 6.2.5.7 1.1 1.6 1.9 1.5.8 0 1-.5 2-.5s1.2.5 2 .5 1.3-.7 1.8-1.5c.3-.5.5-.9.6-1.2-.1 0-1.2-.5-1.2-1.8 0-1.1.9-1.7 1-1.7-.6-.8-1.4-1-1.7-1z" fill="currentColor" stroke="none" />
 	{:else if name === 'pip'}
 		<!-- Python -->
 		<path d="M8 2C5 2 5 3.5 5 3.5v2h3v.5H4S2 5.7 2 8.3 3.8 11 3.8 11H5v-2s-.1-1.8 1.8-1.8h3c1 0 1.8-.8 1.8-1.8V3.5S11.8 2 8 2z" fill="currentColor" stroke="none" />

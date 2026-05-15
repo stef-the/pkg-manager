@@ -11,16 +11,40 @@
 	import LogsView from '$lib/components/views/LogsView.svelte';
 	import TerminalView from '$lib/components/views/TerminalView.svelte';
 	import HistoryView from '$lib/components/views/HistoryView.svelte';
-	import { getActiveView, loadAllPackages } from '$lib/stores/packages.svelte';
+	import {
+		getActiveView, setActiveView, setActiveManagerFilter,
+		loadAllPackages, getTotalOutdatedCount, getAllPackages
+	} from '$lib/stores/packages.svelte';
 	import { loadPinned } from '$lib/stores/pinned.svelte';
+	import { loadState, saveState, updateWindowTitle, updateTrayTooltip } from '$lib/stores/state.svelte';
 	import { createLogger } from '$lib/utils/logger';
+	import type { ViewId, PackageManager } from '$lib/types';
 
 	const log = createLogger('page');
 
+	// Load saved state on mount
 	$effect(() => {
-		log.info('App mounted, loading packages...');
+		log.info('App mounted, loading...');
 		loadAllPackages();
 		loadPinned();
+		loadState().then((state) => {
+			setActiveView(state.activeView);
+			setActiveManagerFilter(state.activeManagerFilter);
+		});
+	});
+
+	// Persist view changes
+	$effect(() => {
+		const view = getActiveView();
+		saveState({ activeView: view });
+	});
+
+	// Update window title and tray when outdated count changes
+	$effect(() => {
+		const outdated = getTotalOutdatedCount();
+		const total = getAllPackages().length;
+		updateWindowTitle(outdated);
+		updateTrayTooltip(total, outdated);
 	});
 </script>
 

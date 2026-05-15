@@ -60,7 +60,7 @@ pub fn command_exists(name: &str) -> bool {
     run_command(check_cmd, &[name]).is_ok()
 }
 
-/// Run a shell command and return its stdout as a String.
+/// Run a shell command with a 5-minute timeout and return its stdout.
 /// Logs the command, and on failure logs stderr.
 pub fn run_command(program: &str, args: &[&str]) -> Result<String, AppError> {
     let cmd_str = format!("{} {}", program, args.join(" "));

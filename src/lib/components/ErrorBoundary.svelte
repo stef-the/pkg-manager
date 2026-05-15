@@ -42,7 +42,7 @@
 			!
 		</div>
 		<h1 class="text-lg font-semibold">Something went wrong</h1>
-		<p class="max-w-md text-center text-sm" style="color: var(--text-secondary);">
+		<p class="max-w-md text-center text-[13px]" style="color: var(--text-secondary);">
 			{error.message}
 		</p>
 		<button

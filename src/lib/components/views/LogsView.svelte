@@ -41,7 +41,7 @@
 </script>
 
 <div class="flex h-full flex-col">
-	<div class="flex items-center justify-between border-b px-6 py-5" style="border-color: var(--border-subtle);">
+	<div class="flex items-center justify-between border-b px-6 py-4" style="border-color: var(--border-subtle);">
 		<div class="flex flex-col gap-1">
 			<h1 class="text-lg font-semibold" style="color: var(--text-primary);">View Logs</h1>
 			<p class="text-[13px]" style="color: var(--text-muted);">
@@ -50,14 +50,14 @@
 		</div>
 		<div class="flex gap-2">
 			<button
-				class="rounded-lg border px-3 py-1.5 text-[12px] font-medium transition-colors duration-100 hover:bg-[var(--bg-hover)]"
+				class="rounded-lg border px-4 py-2 text-[13px] font-medium transition-colors duration-100 hover:bg-[var(--bg-hover)]"
 				style="border-color: var(--border); color: var(--text-primary);"
 				onclick={openLogDir}
 			>
 				Open Folder
 			</button>
 			<button
-				class="rounded-lg px-3 py-1.5 text-[12px] font-medium transition-colors duration-100 hover:opacity-90"
+				class="rounded-lg px-4 py-2 text-[13px] font-medium transition-colors duration-100 hover:opacity-90"
 				style="background-color: var(--accent); color: var(--bg-primary);"
 				onclick={loadLogs}
 			>

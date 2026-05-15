@@ -49,10 +49,10 @@
 
 <div class="flex h-full flex-col">
 	<!-- Header -->
-	<div class="flex items-center justify-between border-b px-6 py-5" style="border-color: var(--border-subtle);">
+	<div class="flex items-center justify-between border-b px-6 py-4" style="border-color: var(--border-subtle);">
 		<div class="flex flex-col gap-0.5">
 			<h1 class="text-lg font-semibold" style="color: var(--text-primary);">Outdated Packages</h1>
-			<span class="text-xs" style="color: var(--text-muted);">
+			<span class="text-[12px]" style="color: var(--text-muted);">
 				{getAllOutdated().length} package{getAllOutdated().length !== 1 ? 's have' : ' has'} updates available
 			</span>
 		</div>

@@ -80,7 +80,7 @@
 			style="border-color: var(--border-subtle);"
 		>
 			<div class="flex items-center gap-2">
-				<h2 class="text-sm font-semibold" style="color: var(--text-primary);">
+				<h2 class="text-[13px] font-semibold" style="color: var(--text-primary);">
 					{packageName}
 				</h2>
 				<span

@@ -79,7 +79,7 @@
 			class="flex items-center justify-between border-b px-5 py-4"
 			style="border-color: var(--border-subtle);"
 		>
-			<h2 class="text-sm font-semibold" style="color: var(--text-primary);">Preferences</h2>
+			<h2 class="text-[13px] font-semibold" style="color: var(--text-primary);">Preferences</h2>
 			<button
 				class="flex h-6 w-6 items-center justify-center rounded-md text-sm transition-colors duration-100 hover:bg-[var(--bg-hover)]"
 				style="color: var(--text-muted);"
