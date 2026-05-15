@@ -115,10 +115,11 @@
 		<circle cx="8" cy="8" r="5" />
 		<circle cx="8" cy="8" r="1.5" fill="currentColor" />
 	{:else if name === 'brew'}
-		<!-- Homebrew — stylized bottle -->
-		<path d="M6 3h4v2H6z" fill="currentColor" stroke="none" />
-		<path d="M5 5h6v1H5z" fill="currentColor" stroke="none" opacity="0.6" />
-		<rect x="5.5" y="6" width="5" height="7" rx="1" fill="currentColor" stroke="none" />
+		<!-- Homebrew — beer mug, clean -->
+		<rect x="4.5" y="4" width="7" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4" />
+		<path d="M11.5 6h1.5a1.2 1.2 0 011.2 1.2v1.6a1.2 1.2 0 01-1.2 1.2H11.5" fill="none" stroke="currentColor" stroke-width="1.2" />
+		<path d="M7 7v3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+		<path d="M9.5 7v3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
 	{:else if name === 'npm'}
 		<!-- npm — the classic red box n -->
 		<rect x="2" y="3" width="12" height="10" rx="0.5" fill="currentColor" stroke="none" />

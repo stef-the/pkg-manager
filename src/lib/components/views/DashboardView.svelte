@@ -106,21 +106,26 @@
 		}
 	}
 
-	// Load storage info (once — instant, no du)
+	// Load storage info (once — uses df, instant)
 	let storageLoaded = false;
 	$effect(() => {
 		if (storageLoaded) return;
 		storageLoaded = true;
 		if (typeof window !== 'undefined' && '__TAURI__' in window) {
-			invoke<unknown>('get_storage_info')
+			invoke<Record<string, unknown>>('get_storage_info')
 				.then((data) => {
-					// New format: { diskTotal, diskUsed, diskPct, managers }
-					if (data && typeof data === 'object' && 'diskTotal' in data) {
-						storageInfo = data as { diskTotal: string; diskUsed: string; diskPct: number };
+					console.log('Storage info response:', data);
+					if (data && typeof data.diskTotal === 'string' && typeof data.diskUsed === 'string') {
+						storageInfo = {
+							diskTotal: data.diskTotal as string,
+							diskUsed: data.diskUsed as string,
+							diskPct: (data.diskPct as number) ?? 0
+						};
 					}
-					// Old format or unexpected: just ignore, fallback shows package count
 				})
-				.catch(() => {});
+				.catch((e) => {
+					console.error('Storage info failed:', e);
+				});
 		}
 	});
 </script>
@@ -154,20 +159,20 @@
 		</div>
 	{/if}
 
-	<!-- Top stats + chart row -->
-	<div class="flex gap-3 px-6" style="max-height: 240px;">
-		<!-- Left column: stats cards -->
-		<div class="flex flex-col gap-3" style="min-width: 140px;">
+	<!-- Stats row — fixed height, full width -->
+	<div class="flex gap-3 px-6" style="height: 200px;">
+		<!-- Left: stat cards stacked -->
+		<div class="flex flex-col gap-3" style="width: 150px;">
 			<div
-				class="flex flex-col gap-1 rounded-lg border px-4 py-3"
+				class="flex flex-1 flex-col justify-center gap-1 rounded-lg border px-4 py-3"
 				style="border-color: var(--border-subtle); background-color: var(--surface);"
 			>
-				<span class="text-[10px] font-medium uppercase tracking-wider" style="color: var(--text-muted);">Total</span>
+				<span class="text-[10px] font-medium uppercase tracking-wider" style="color: var(--text-muted);">Installed</span>
 				<span class="text-2xl font-bold" style="color: var(--text-primary);">{getTotalPackageCount()}</span>
 				<span class="text-[10px]" style="color: var(--text-muted);">{getAvailableManagers().length} managers</span>
 			</div>
 			<button
-				class="flex flex-col gap-1 rounded-lg border px-4 py-3 text-left transition-colors duration-100 hover:border-[var(--warning)]"
+				class="flex flex-1 flex-col justify-center gap-1 rounded-lg border px-4 py-3 text-left transition-colors duration-100 hover:border-[var(--warning)]"
 				style="border-color: var(--border-subtle); background-color: var(--surface);"
 				onclick={() => setActiveView('outdated')}
 			>
@@ -181,12 +186,12 @@
 			</button>
 		</div>
 
-		<!-- Donut chart -->
+		<!-- Center: donut (fills remaining width, fixed height) -->
 		<div
-			class="flex flex-col items-center justify-center gap-2 rounded-lg border px-4 py-3"
-			style="border-color: var(--border-subtle); background-color: var(--surface); width: 200px;"
+			class="flex flex-1 items-center justify-center gap-4 rounded-lg border px-5 py-3"
+			style="border-color: var(--border-subtle); background-color: var(--surface);"
 		>
-			<svg width="120" height="120" viewBox="0 0 120 120">
+			<svg class="flex-shrink-0" width="130" height="130" viewBox="0 0 120 120">
 				{#each donutSegments as seg}
 					<path
 						d={donutArc(seg.start, seg.end, 45, 60, 60)}
@@ -220,31 +225,32 @@
 					</text>
 				{/if}
 			</svg>
-			<div class="flex flex-wrap justify-center gap-x-3 gap-y-0.5">
+			<div class="flex flex-col gap-1">
 				{#each donutSegments as seg}
 					<button
-						class="flex items-center gap-1 rounded px-1 py-0.5 transition-colors duration-75"
+						class="flex items-center gap-1.5 rounded px-1.5 py-0.5 transition-colors duration-75"
 						style={hoveredSegment === seg.id ? `background-color: ${seg.color}22;` : ''}
 						onmouseenter={() => (hoveredSegment = seg.id)}
 						onmouseleave={() => (hoveredSegment = null)}
 					>
-						<div class="h-1.5 w-1.5 rounded-full" style={`background-color: ${seg.color};`}></div>
-						<span class="text-[9px]" style="color: var(--text-muted);">{managerDisplayName(seg.id)}</span>
+						<div class="h-2 w-2 flex-shrink-0 rounded-full" style={`background-color: ${seg.color};`}></div>
+						<span class="text-[10px]" style="color: var(--text-secondary);">{managerDisplayName(seg.id)}</span>
+						<span class="font-mono text-[10px]" style="color: var(--text-muted);">{seg.count}</span>
 					</button>
 				{/each}
 			</div>
 		</div>
 
-		<!-- Disk usage -->
+		<!-- Right: disk usage -->
 		<div
 			class="flex flex-col justify-center gap-2 rounded-lg border px-4 py-3"
-			style="border-color: var(--border-subtle); background-color: var(--surface); min-width: 160px;"
+			style="border-color: var(--border-subtle); background-color: var(--surface);"
 		>
 			<span class="text-[10px] font-medium uppercase tracking-wider" style="color: var(--text-muted);">Disk</span>
 			{#if storageInfo}
-				<div class="flex flex-col gap-0.5">
-					<span class="font-mono text-[16px] font-bold" style="color: var(--text-primary);">{storageInfo.diskUsed}</span>
-					<span class="text-[10px]" style="color: var(--text-muted);">of {storageInfo.diskTotal}</span>
+				<div class="flex items-baseline gap-1.5">
+					<span class="font-mono text-[18px] font-bold" style="color: var(--text-primary);">{storageInfo.diskUsed}</span>
+					<span class="text-[11px]" style="color: var(--text-muted);">/ {storageInfo.diskTotal}</span>
 				</div>
 				<div class="h-1.5 w-full overflow-hidden rounded-full" style="background-color: var(--bg-primary);">
 					<div
@@ -254,8 +260,9 @@
 				</div>
 				<span class="text-[9px]" style="color: var(--text-muted);">{storageInfo.diskPct}% used</span>
 			{:else}
-				<span class="font-mono text-[16px] font-bold" style="color: var(--text-primary);">{getTotalPackageCount()}</span>
-				<span class="text-[10px]" style="color: var(--text-muted);">packages</span>
+				<span class="font-mono text-[18px] font-bold" style="color: var(--text-primary);">{getTotalPackageCount()}</span>
+				<span class="text-[10px]" style="color: var(--text-muted);">packages installed</span>
+				<span class="text-[9px]" style="color: var(--text-muted);">Restart app for disk info</span>
 			{/if}
 		</div>
 	</div>

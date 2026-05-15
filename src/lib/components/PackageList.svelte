@@ -150,8 +150,8 @@
 					}`}
 					onclick={() => setSelectedPackage(pkg)}
 				>
-					<!-- Manager icon as package icon fallback -->
-					<span class="flex w-4 items-center justify-center" style={isSelected ? '' : 'opacity: 0.4;'}>
+					<!-- Manager icon -->
+					<span class="flex h-4 w-4 flex-shrink-0 items-center justify-center" style={isSelected ? '' : 'opacity: 0.4;'}>
 						<Icon name={pkg.manager === 'brew' ? 'brew' : pkg.manager === 'winget' ? 'winget' : 'npm'} size={14} />
 					</span>
 
@@ -217,7 +217,7 @@
 				>
 					<div class="flex items-start justify-between">
 						<div class="flex items-center gap-2">
-							<span style={isSelected ? '' : 'opacity: 0.4;'}>
+							<span class="flex h-4 w-4 flex-shrink-0 items-center justify-center" style={isSelected ? '' : 'opacity: 0.4;'}>
 								<Icon name={pkg.manager === 'brew' ? 'brew' : pkg.manager === 'winget' ? 'winget' : 'npm'} size={16} />
 							</span>
 							<span class="text-[13px] font-semibold" style={isSelected ? '' : 'color: var(--text-primary);'}>
