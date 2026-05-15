@@ -1,1 +1,121 @@
 @import 'tailwindcss';
+
+@theme {
+  /* Polar Night */
+  --color-nord0: #2e3440;
+  --color-nord1: #3b4252;
+  --color-nord2: #434c5e;
+  --color-nord3: #4c566a;
+
+  /* Snow Storm */
+  --color-nord4: #d8dee9;
+  --color-nord5: #e5e9f0;
+  --color-nord6: #eceff4;
+
+  /* Frost */
+  --color-nord7: #8fbcbb;
+  --color-nord8: #88c0d0;
+  --color-nord9: #81a1c1;
+  --color-nord10: #5e81ac;
+
+  /* Aurora */
+  --color-nord11: #bf616a;
+  --color-nord12: #d08770;
+  --color-nord13: #ebcb8b;
+  --color-nord14: #a3be8c;
+  --color-nord15: #b48ead;
+}
+
+/* Light mode (default) */
+:root {
+  --bg-primary: var(--color-nord6);
+  --bg-secondary: var(--color-nord5);
+  --bg-tertiary: var(--color-nord4);
+  --bg-hover: #dde2ec;
+  --text-primary: var(--color-nord0);
+  --text-secondary: var(--color-nord2);
+  --text-muted: var(--color-nord3);
+  --accent: var(--color-nord10);
+  --accent-hover: var(--color-nord9);
+  --border: #c9ced9;
+  --border-subtle: #d8dce6;
+  --surface: #ffffff;
+  --surface-raised: var(--color-nord6);
+  --success: var(--color-nord14);
+  --warning: var(--color-nord13);
+  --error: var(--color-nord11);
+  --info: var(--color-nord8);
+}
+
+/* Dark mode */
+.dark {
+  --bg-primary: var(--color-nord0);
+  --bg-secondary: var(--color-nord1);
+  --bg-tertiary: var(--color-nord2);
+  --bg-hover: #3f4859;
+  --text-primary: var(--color-nord6);
+  --text-secondary: var(--color-nord4);
+  --text-muted: var(--color-nord3);
+  --accent: var(--color-nord8);
+  --accent-hover: var(--color-nord9);
+  --border: var(--color-nord3);
+  --border-subtle: var(--color-nord2);
+  --surface: var(--color-nord1);
+  --surface-raised: var(--color-nord2);
+  --success: var(--color-nord14);
+  --warning: var(--color-nord13);
+  --error: var(--color-nord11);
+  --info: var(--color-nord8);
+}
+
+/* Base styles */
+html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  overflow: hidden;
+}
+
+/* Interactive elements */
+button,
+[role="button"],
+a,
+input[type="range"] {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Selection styling */
+::selection {
+  background: var(--accent);
+  color: var(--bg-primary);
+}

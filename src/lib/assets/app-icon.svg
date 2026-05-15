@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="#2e3440"/>
+
+  <!-- Package box -->
+  <path d="M256 96l140 72v176l-140 72-140-72V168z" fill="#3b4252" stroke="#88c0d0" stroke-width="8"/>
+
+  <!-- Box top face -->
+  <path d="M116 168l140 72 140-72" fill="none" stroke="#88c0d0" stroke-width="8" stroke-linejoin="round"/>
+
+  <!-- Center line -->
+  <path d="M256 240v176" stroke="#88c0d0" stroke-width="8"/>
+
+  <!-- Arrow up (upgrade/manage) -->
+  <path d="M256 128v-48" stroke="#eceff4" stroke-width="12" stroke-linecap="round"/>
+  <path d="M232 104l24-24 24 24" stroke="#eceff4" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Accent dots for "multiple managers" -->
+  <circle cx="200" cy="320" r="12" fill="#8fbcbb"/>
+  <circle cx="256" cy="340" r="12" fill="#81a1c1"/>
+  <circle cx="312" cy="320" r="12" fill="#5e81ac"/>
+</svg>
