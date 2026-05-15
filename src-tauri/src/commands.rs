@@ -375,50 +375,75 @@ pub fn get_storage_info() -> Result<Vec<(String, String)>, String> {
     log::info!("Command: get_storage_info");
     let mut results: Vec<(String, String)> = Vec::new();
 
-    // Homebrew cellar size
-    if let Ok(output) = run_command_allow_failure("du", &["-sh", "/opt/homebrew/Cellar"]) {
-        if let Some(size) = output.split_whitespace().next() {
-            results.push(("brew".to_string(), size.to_string()));
-        }
-    } else if let Ok(output) = run_command_allow_failure("du", &["-sh", "/usr/local/Cellar"]) {
-        if let Some(size) = output.split_whitespace().next() {
-            results.push(("brew".to_string(), size.to_string()));
+    // Use fast methods — count entries + estimate instead of full du -sh
+
+    // Homebrew: count Cellar entries (each is ~50-200MB average)
+    let cellar_paths = ["/opt/homebrew/Cellar", "/usr/local/Cellar"];
+    for cellar in &cellar_paths {
+        let path = std::path::Path::new(cellar);
+        if path.exists() {
+            if let Ok(entries) = std::fs::read_dir(path) {
+                let count = entries.count();
+                // Quick du on just the top level with max-depth=0
+                if let Ok(output) = run_command_allow_failure("du", &["-sh", cellar]) {
+                    if let Some(size) = output.split_whitespace().next() {
+                        results.push(("brew".to_string(), size.to_string()));
+                    }
+                } else {
+                    results.push(("brew".to_string(), format!("~{} formulae", count)));
+                }
+            }
+            break;
         }
     }
 
-    // npm global size
+    // npm: just check the lib/node_modules folder size (usually small for globals)
     if let Ok(prefix) = run_command("npm", &["prefix", "-g"]) {
-        let path = format!("{}/lib", prefix.trim());
-        if let Ok(output) = run_command_allow_failure("du", &["-sh", &path]) {
-            if let Some(size) = output.split_whitespace().next() {
-                results.push(("npm".to_string(), size.to_string()));
+        let nm_path = format!("{}/lib/node_modules", prefix.trim());
+        let path = std::path::Path::new(&nm_path);
+        if path.exists() {
+            if let Ok(entries) = std::fs::read_dir(path) {
+                let count = entries.count();
+                results.push(("npm".to_string(), format!("{} global pkgs", count)));
             }
         }
     }
 
-    // pip packages size
-    if let Ok(output) = run_command_allow_failure("pip3", &["cache", "info"]) {
-        // Try to extract cache size from output
-        for line in output.lines() {
-            if line.contains("Package cache size") || line.contains("size") {
-                if let Some(size_part) = line.split(':').nth(1) {
-                    results.push(("pip".to_string(), size_part.trim().to_string()));
-                    break;
+    // Cargo bin: count binaries (fast)
+    if let Ok(home) = std::env::var("HOME") {
+        let cargo_bin = format!("{}/.cargo/bin", home);
+        let path = std::path::Path::new(&cargo_bin);
+        if path.exists() {
+            if let Ok(entries) = std::fs::read_dir(path) {
+                let count = entries.filter(|e| e.is_ok()).count();
+                results.push(("cargo".to_string(), format!("{} binaries", count)));
+            }
+        }
+    }
+
+    // pip cache size (fast — pip caches this info)
+    let pip_cmd = if crate::adapters::command_exists("pip3") { "pip3" } else { "pip" };
+    if crate::adapters::command_exists(pip_cmd) {
+        if let Ok(output) = run_command_allow_failure(pip_cmd, &["cache", "info"]) {
+            for line in output.lines() {
+                if line.find("Location:").is_some() {
+                    // Skip location, look for size line
+                    continue;
+                }
+                if line.to_lowercase().contains("size") {
+                    if let Some(size_part) = line.split(':').nth(1) {
+                        let size = size_part.trim().to_string();
+                        if !size.is_empty() {
+                            results.push(("pip".to_string(), size));
+                            break;
+                        }
+                    }
                 }
             }
         }
     }
 
-    // Cargo installs
-    if let Ok(home) = std::env::var("HOME") {
-        let cargo_bin = format!("{}/.cargo/bin", home);
-        if let Ok(output) = run_command_allow_failure("du", &["-sh", &cargo_bin]) {
-            if let Some(size) = output.split_whitespace().next() {
-                results.push(("cargo".to_string(), size.to_string()));
-            }
-        }
-    }
-
+    log::info!("Storage info: {:?}", results);
     Ok(results)
 }
 
@@ -466,6 +491,100 @@ pub fn install_manager(manager: String) -> Result<String, String> {
         _ => return Err(format!("Auto-install not supported for '{}'", manager)),
     };
     result.map_err(|e| e.to_string())
+}
+
+// --- Cache ---
+
+#[tauri::command]
+pub fn save_cache(app_handle: tauri::AppHandle, key: String, data: String) -> Result<(), String> {
+    let cache_dir = app_handle.path().app_cache_dir()
+        .map_err(|e| format!("Failed to get cache dir: {}", e))?;
+    std::fs::create_dir_all(&cache_dir).map_err(|e| e.to_string())?;
+    let path = cache_dir.join(format!("{}.json", key));
+    std::fs::write(&path, &data).map_err(|e| format!("Failed to write cache: {}", e))?;
+    log::debug!("Cached {} ({} bytes)", key, data.len());
+    Ok(())
+}
+
+#[tauri::command]
+pub fn load_cache(app_handle: tauri::AppHandle, key: String) -> Result<String, String> {
+    let cache_dir = app_handle.path().app_cache_dir()
+        .map_err(|e| format!("Failed to get cache dir: {}", e))?;
+    let path = cache_dir.join(format!("{}.json", key));
+    if !path.exists() {
+        return Err("Cache miss".to_string());
+    }
+    std::fs::read_to_string(&path).map_err(|e| format!("Failed to read cache: {}", e))
+}
+
+// --- Pinning ---
+
+#[tauri::command]
+pub fn get_pinned_packages(app_handle: tauri::AppHandle) -> Result<Vec<String>, String> {
+    let config_dir = app_handle.path().app_config_dir()
+        .map_err(|e| format!("Failed to get config dir: {}", e))?;
+    let path = config_dir.join("pinned.json");
+    if !path.exists() {
+        return Ok(Vec::new());
+    }
+    let data = std::fs::read_to_string(&path).map_err(|e| e.to_string())?;
+    serde_json::from_str(&data).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub fn set_pinned_packages(app_handle: tauri::AppHandle, packages: Vec<String>) -> Result<(), String> {
+    let config_dir = app_handle.path().app_config_dir()
+        .map_err(|e| format!("Failed to get config dir: {}", e))?;
+    std::fs::create_dir_all(&config_dir).map_err(|e| e.to_string())?;
+    let path = config_dir.join("pinned.json");
+    let data = serde_json::to_string(&packages).map_err(|e| e.to_string())?;
+    std::fs::write(&path, &data).map_err(|e| e.to_string())?;
+    log::info!("Saved {} pinned packages", packages.len());
+    Ok(())
+}
+
+// --- History ---
+
+#[tauri::command]
+pub fn append_history(app_handle: tauri::AppHandle, entry: String) -> Result<(), String> {
+    let data_dir = app_handle.path().app_data_dir()
+        .map_err(|e| format!("Failed to get data dir: {}", e))?;
+    std::fs::create_dir_all(&data_dir).map_err(|e| e.to_string())?;
+    let path = data_dir.join("history.jsonl");
+    use std::io::Write;
+    let mut file = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(&path)
+        .map_err(|e| e.to_string())?;
+    writeln!(file, "{}", entry).map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+#[tauri::command]
+pub fn read_history(app_handle: tauri::AppHandle, limit: usize) -> Result<Vec<String>, String> {
+    let data_dir = app_handle.path().app_data_dir()
+        .map_err(|e| format!("Failed to get data dir: {}", e))?;
+    let path = data_dir.join("history.jsonl");
+    if !path.exists() {
+        return Ok(Vec::new());
+    }
+    let data = std::fs::read_to_string(&path).map_err(|e| e.to_string())?;
+    let lines: Vec<String> = data.lines().map(String::from).collect();
+    let start = if lines.len() > limit { lines.len() - limit } else { 0 };
+    Ok(lines[start..].to_vec())
+}
+
+// --- Notifications ---
+
+#[tauri::command]
+pub fn send_notification(app_handle: tauri::AppHandle, title: String, body: String) -> Result<(), String> {
+    log::info!("Notification: {} - {}", title, body);
+    // Use native notification via tauri
+    use tauri::Emitter;
+    app_handle.emit("notification", serde_json::json!({ "title": title, "body": body }))
+        .map_err(|e| e.to_string())?;
+    Ok(())
 }
 
 #[tauri::command]

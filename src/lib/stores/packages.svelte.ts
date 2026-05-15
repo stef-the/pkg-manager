@@ -2,6 +2,7 @@ import type { Package, OutdatedPackage, ManagerInfo, PackageManager, ViewId, Sys
 import * as commands from '$lib/utils/commands';
 import { addToast } from '$lib/stores/toast.svelte';
 import { runTask, runBatchTask } from '$lib/stores/tasks.svelte';
+import { recordAction } from '$lib/stores/history.svelte';
 import { createLogger } from '$lib/utils/logger';
 
 const log = createLogger('packages');
@@ -212,6 +213,7 @@ export async function searchRemotePackages(manager: PackageManager, query: strin
 export function installPkg(manager: PackageManager, name: string): void {
 	runTask(`Installing ${name}`, async () => {
 		await commands.installPackage(manager, name);
+		await recordAction('install', manager, name);
 		await loadPackagesForManager(manager);
 	}, {
 		successMessage: `Installed ${name}`,
@@ -221,6 +223,7 @@ export function installPkg(manager: PackageManager, name: string): void {
 export function uninstallPkg(manager: PackageManager, name: string): void {
 	runTask(`Uninstalling ${name}`, async () => {
 		await commands.uninstallPackage(manager, name);
+		await recordAction('uninstall', manager, name);
 		if (selectedPackage?.name === name && selectedPackage?.manager === manager) {
 			selectedPackage = null;
 		}
@@ -233,6 +236,7 @@ export function uninstallPkg(manager: PackageManager, name: string): void {
 export function updatePkg(manager: PackageManager, name: string): void {
 	runTask(`Updating ${name}`, async () => {
 		await commands.updatePackage(manager, name);
+		await recordAction('update', manager, name);
 		await Promise.all([
 			loadPackagesForManager(manager),
 			loadOutdatedForManager(manager)

@@ -57,7 +57,8 @@ export type ViewId =
 	| 'export-import'
 	| 'logs'
 	| 'terminal'
-	| 'debloat';
+	| 'debloat'
+	| 'history';
 
 export interface ToastItem {
 	id: string;

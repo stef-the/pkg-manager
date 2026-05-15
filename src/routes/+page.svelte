@@ -10,7 +10,9 @@
 	import ExportImportView from '$lib/components/views/ExportImportView.svelte';
 	import LogsView from '$lib/components/views/LogsView.svelte';
 	import TerminalView from '$lib/components/views/TerminalView.svelte';
+	import HistoryView from '$lib/components/views/HistoryView.svelte';
 	import { getActiveView, loadAllPackages } from '$lib/stores/packages.svelte';
+	import { loadPinned } from '$lib/stores/pinned.svelte';
 	import { createLogger } from '$lib/utils/logger';
 
 	const log = createLogger('page');
@@ -18,6 +20,7 @@
 	$effect(() => {
 		log.info('App mounted, loading packages...');
 		loadAllPackages();
+		loadPinned();
 	});
 </script>
 
@@ -43,4 +46,6 @@
 	<LogsView />
 {:else if getActiveView() === 'terminal'}
 	<TerminalView />
+{:else if getActiveView() === 'history'}
+	<HistoryView />
 {/if}

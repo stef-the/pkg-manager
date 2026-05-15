@@ -54,6 +54,13 @@ pub fn run() {
             commands::import_packages,
             commands::install_manager,
             commands::get_storage_info,
+            commands::save_cache,
+            commands::load_cache,
+            commands::get_pinned_packages,
+            commands::set_pinned_packages,
+            commands::append_history,
+            commands::read_history,
+            commands::send_notification,
         ])
         .setup(|app| {
             log::info!("Pkg Manager starting up");

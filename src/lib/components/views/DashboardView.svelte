@@ -103,12 +103,17 @@
 		}
 	}
 
-	// Load storage info
+	// Load storage info (once)
+	let storageLoaded = false;
 	$effect(() => {
+		if (storageLoaded) return;
+		storageLoaded = true;
 		if (typeof window !== 'undefined' && '__TAURI__' in window) {
 			invoke<[string, string][]>('get_storage_info')
 				.then((data) => { storageData = data; })
-				.catch(() => {});
+				.catch(() => { storageData = []; });
+		} else {
+			storageData = [];
 		}
 	});
 

@@ -17,6 +17,7 @@
 	} from '$lib/stores/tasks.svelte';
 	import { getDateFormat } from '$lib/stores/theme.svelte';
 	import PackageInfoModal from '$lib/components/PackageInfoModal.svelte';
+	import { isPinned, togglePin } from '$lib/stores/pinned.svelte';
 	import { invoke } from '@tauri-apps/api/core';
 	import type { PackageManager } from '$lib/types';
 
@@ -84,14 +85,26 @@
 			<span class="text-[11px] font-medium uppercase tracking-wider" style="color: var(--text-muted);">
 				Package Details
 			</span>
-			<button
-				class="flex h-6 w-6 items-center justify-center rounded-md text-xs transition-colors duration-100 hover:bg-[var(--bg-hover)]"
-				style="color: var(--text-muted);"
-				aria-label="Close details"
-				onclick={() => setSelectedPackage(null)}
-			>
-				<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8" /></svg>
-			</button>
+			<div class="flex items-center gap-1">
+				<button
+					class="flex h-6 w-6 items-center justify-center rounded-md text-xs transition-colors duration-100 hover:bg-[var(--bg-hover)]"
+					style={isPinned(pkg.manager, pkg.name) ? 'color: var(--warning);' : 'color: var(--text-muted);'}
+					aria-label={isPinned(pkg.manager, pkg.name) ? 'Unpin package' : 'Pin package'}
+					onclick={() => togglePin(pkg.manager, pkg.name)}
+				>
+					<svg width="12" height="12" viewBox="0 0 16 16" fill={isPinned(pkg.manager, pkg.name) ? 'currentColor' : 'none'} stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M5 2l6 0 0 4 1.5 2H3.5L5 6z" /><path d="M8 8v6" />
+					</svg>
+				</button>
+				<button
+					class="flex h-6 w-6 items-center justify-center rounded-md text-xs transition-colors duration-100 hover:bg-[var(--bg-hover)]"
+					style="color: var(--text-muted);"
+					aria-label="Close details"
+					onclick={() => setSelectedPackage(null)}
+				>
+					<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8" /></svg>
+				</button>
+			</div>
 		</div>
 
 		<!-- Content -->
@@ -105,7 +118,14 @@
 					>
 						{managerDisplayName(pkg.manager)}
 					</span>
-					{#if outdated}
+					{#if isPinned(pkg.manager, pkg.name)}
+						<span
+							class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold"
+							style="background-color: var(--warning); color: var(--color-nord0);"
+						>
+							Pinned
+						</span>
+					{:else if outdated}
 						<span
 							class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold"
 							style="background-color: var(--warning); color: var(--color-nord0);"

@@ -28,7 +28,8 @@
 		{ id: 'debloat', label: 'Debloat', icon: 'debloat' },
 		{ id: 'export-import', label: 'Export / Import', icon: 'export' },
 		{ id: 'logs', label: 'View Logs', icon: 'logs' },
-		{ id: 'terminal', label: 'Terminal', icon: 'terminal' }
+		{ id: 'terminal', label: 'Terminal', icon: 'terminal' },
+		{ id: 'history', label: 'History', icon: 'logs' }
 	];
 
 	function managerDisplayName(id: string): string {

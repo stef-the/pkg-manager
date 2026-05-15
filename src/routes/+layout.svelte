@@ -5,6 +5,7 @@
 	import DetailPanel from '$lib/components/DetailPanel.svelte';
 	import ErrorBoundary from '$lib/components/ErrorBoundary.svelte';
 	import Toast from '$lib/components/Toast.svelte';
+	import KeyboardHandler from '$lib/components/KeyboardHandler.svelte';
 	import { initTheme, getEffectiveTheme, applyThemeToDocument } from '$lib/stores/theme.svelte';
 
 	let { children } = $props();
@@ -34,4 +35,5 @@
 		<DetailPanel />
 	</div>
 	<Toast />
+	<KeyboardHandler />
 </ErrorBoundary>
