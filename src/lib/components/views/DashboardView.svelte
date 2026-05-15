@@ -149,7 +149,7 @@
 	{/if}
 
 	<!-- Top stats + chart row -->
-	<div class="flex gap-3 px-6">
+	<div class="flex gap-3 px-6" style="max-height: 240px;">
 		<!-- Left column: stats cards -->
 		<div class="flex flex-col gap-3" style="min-width: 140px;">
 			<div
@@ -177,10 +177,10 @@
 
 		<!-- Donut chart -->
 		<div
-			class="flex flex-1 flex-col items-center justify-between gap-2 rounded-lg border px-4 py-3"
-			style="border-color: var(--border-subtle); background-color: var(--surface); min-width: 200px;"
+			class="flex flex-col items-center justify-center gap-2 rounded-lg border px-4 py-3"
+			style="border-color: var(--border-subtle); background-color: var(--surface); width: 200px;"
 		>
-			<svg class="flex-shrink-0" width="160" height="160" viewBox="0 0 120 120">
+			<svg width="120" height="120" viewBox="0 0 120 120">
 				{#each donutSegments as seg}
 					<path
 						d={donutArc(seg.start, seg.end, 45, 60, 60)}
@@ -231,25 +231,25 @@
 
 		<!-- Disk usage -->
 		<div
-			class="flex flex-1 flex-col justify-center gap-3 rounded-lg border px-4 py-3"
-			style="border-color: var(--border-subtle); background-color: var(--surface);"
+			class="flex flex-col justify-center gap-2 rounded-lg border px-4 py-3"
+			style="border-color: var(--border-subtle); background-color: var(--surface); min-width: 160px;"
 		>
-			<span class="text-[10px] font-medium uppercase tracking-wider" style="color: var(--text-muted);">Disk Usage</span>
+			<span class="text-[10px] font-medium uppercase tracking-wider" style="color: var(--text-muted);">Disk</span>
 			{#if storageInfo}
-				<div class="flex items-baseline gap-1.5">
-					<span class="font-mono text-[20px] font-bold" style="color: var(--text-primary);">{storageInfo.diskUsed}</span>
-					<span class="text-[12px]" style="color: var(--text-muted);">/ {storageInfo.diskTotal}</span>
+				<div class="flex flex-col gap-0.5">
+					<span class="font-mono text-[16px] font-bold" style="color: var(--text-primary);">{storageInfo.diskUsed}</span>
+					<span class="text-[10px]" style="color: var(--text-muted);">of {storageInfo.diskTotal}</span>
 				</div>
-				<div class="h-2 w-full overflow-hidden rounded-full" style="background-color: var(--bg-primary);">
+				<div class="h-1.5 w-full overflow-hidden rounded-full" style="background-color: var(--bg-primary);">
 					<div
 						class="h-full rounded-full transition-all duration-500"
 						style={`width: ${storageInfo.diskPct}%; background-color: ${storageInfo.diskPct > 90 ? 'var(--error)' : storageInfo.diskPct > 70 ? 'var(--warning)' : 'var(--accent)'};`}
 					></div>
 				</div>
-				<span class="text-[10px]" style="color: var(--text-muted);">{storageInfo.diskPct}% used</span>
+				<span class="text-[9px]" style="color: var(--text-muted);">{storageInfo.diskPct}% used</span>
 			{:else}
-				<span class="font-mono text-[20px] font-bold" style="color: var(--text-primary);">{getTotalPackageCount()}</span>
-				<span class="text-[10px]" style="color: var(--text-muted);">total packages installed</span>
+				<span class="font-mono text-[16px] font-bold" style="color: var(--text-primary);">{getTotalPackageCount()}</span>
+				<span class="text-[10px]" style="color: var(--text-muted);">packages</span>
 			{/if}
 		</div>
 	</div>
