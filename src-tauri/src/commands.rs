@@ -404,36 +404,13 @@ pub fn get_storage_info() -> Result<serde_json::Value, String> {
         }
     }
 
-    // Count package entries (instant, no du)
-    let mut manager_counts: Vec<(String, usize)> = Vec::new();
-
-    let cellar_paths = ["/opt/homebrew/Cellar", "/usr/local/Cellar"];
-    for cellar in &cellar_paths {
-        let p = std::path::Path::new(cellar);
-        if p.exists() {
-            if let Ok(e) = std::fs::read_dir(p) { manager_counts.push(("brew".to_string(), e.count())); }
-            break;
-        }
-    }
-
-    if let Ok(prefix) = run_command("npm", &["prefix", "-g"]) {
-        let nm = format!("{}/lib/node_modules", prefix.trim());
-        if let Ok(e) = std::fs::read_dir(&nm) { manager_counts.push(("npm".to_string(), e.count())); }
-    }
-
-    if let Ok(home) = std::env::var("HOME") {
-        let cb = format!("{}/.cargo/bin", home);
-        if let Ok(e) = std::fs::read_dir(&cb) { manager_counts.push(("cargo".to_string(), e.filter(|x| x.is_ok()).count())); }
-    }
-
-    log::info!("Storage: disk {}/ {}", format_bytes(disk_used), format_bytes(disk_total));
+    log::info!("Storage: disk {} / {}", format_bytes(disk_used), format_bytes(disk_total));
 
     Ok(serde_json::json!({
         "diskTotal": format_bytes(disk_total),
         "diskUsed": format_bytes(disk_used),
         "diskAvailable": format_bytes(disk_available),
-        "diskPct": if disk_total > 0 { (disk_used as f64 / disk_total as f64 * 100.0).round() as u64 } else { 0 },
-        "managers": manager_counts.into_iter().map(|(m, c)| serde_json::json!({"id": m, "count": c})).collect::<Vec<_>>()
+        "diskPct": if disk_total > 0 { (disk_used as f64 / disk_total as f64 * 100.0).round() as u64 } else { 0 }
     }))
 }
 
