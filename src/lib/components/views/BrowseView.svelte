@@ -102,6 +102,11 @@
 		return getAllPackages().some((p) => p.name === name && p.manager === manager);
 	}
 
+	function managedElsewhere(name: string, manager: string): string | null {
+		const other = getAllPackages().find((p) => p.name === name && p.manager !== manager);
+		return other ? other.manager : null;
+	}
+
 	function managerColor(id: string): string {
 		switch (id) {
 			case 'brew': return 'var(--color-nord7)';
@@ -191,13 +196,18 @@
 						{#if installed}
 							<span class="rounded-full px-3 py-1 text-[10px] font-semibold" style="background-color: var(--success); color: var(--color-nord0);">Installed</span>
 						{:else}
-							<button
-								class="rounded-full px-3 py-1 text-[10px] font-semibold transition-colors duration-100 hover:opacity-90"
-								style="background-color: var(--accent); color: var(--bg-primary);"
-								onclick={() => installPkg(pkg.manager as PackageManager, pkg.name)}
-							>
-								Install
-							</button>
+							{@const otherMgr = managedElsewhere(pkg.name, pkg.manager)}
+							{#if otherMgr}
+								<span class="rounded-full px-3 py-1 text-[10px] font-semibold" style="background-color: var(--bg-tertiary); color: var(--text-muted);">via {otherMgr}</span>
+							{:else}
+								<button
+									class="rounded-full px-3 py-1 text-[10px] font-semibold transition-colors duration-100 hover:opacity-90"
+									style="background-color: var(--accent); color: var(--bg-primary);"
+									onclick={() => installPkg(pkg.manager as PackageManager, pkg.name)}
+								>
+									Install
+								</button>
+							{/if}
 						{/if}
 					</div>
 				{/each}
@@ -237,6 +247,8 @@
 										</span>
 										{#if installed}
 											<span class="text-[10px] font-medium" style="color: var(--success);">Installed</span>
+										{:else if managedElsewhere(pkg.name, pkg.manager)}
+											<span class="text-[9px]" style="color: var(--text-muted);">via {managedElsewhere(pkg.name, pkg.manager)}</span>
 										{:else}
 											<button
 												class="rounded-md px-2 py-0.5 text-[10px] font-medium transition-colors duration-100 hover:opacity-90"
