@@ -326,13 +326,13 @@
 
 	<!-- Activity — always visible at bottom -->
 	{#if getTasks().length > 0}
-		<div class="flex max-h-[250px] min-h-[80px] flex-col gap-2 overflow-y-auto border-t px-4 py-3" style="border-color: var(--border-subtle);">
+		<div class="flex flex-col gap-2 overflow-y-auto border-t px-4 py-3" style="border-color: var(--border-subtle); max-height: 300px;">
 			<span class="text-[10px] font-medium uppercase tracking-wider" style="color: var(--text-muted);">
 				Activity
 			</span>
 			{#each getTasks() as task (task.id)}
 				<div
-					class="relative flex flex-col gap-1.5 overflow-hidden rounded-lg border px-3 py-2"
+					class="relative flex flex-shrink-0 flex-col gap-1.5 overflow-hidden rounded-lg border px-3 py-2"
 					style="border-color: var(--border-subtle);"
 				>
 					<div class="flex items-center gap-2">
