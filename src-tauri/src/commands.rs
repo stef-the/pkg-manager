@@ -99,10 +99,22 @@ pub async fn update_package(manager: String, name: String) -> Result<(), String>
 
 #[tauri::command]
 pub async fn get_package_managers() -> Vec<ManagerInfo> {
-    blocking_infallible(|| {
-        log::info!("Command: get_package_managers");
-        adapters::get_all_adapters().iter().map(|a| a.info()).collect()
-    }).await
+    // Run each adapter's info() check in parallel on the thread pool
+    log::info!("Command: get_package_managers");
+    let adapters = adapters::get_all_adapters();
+    let mut handles = Vec::new();
+
+    for adapter in adapters {
+        handles.push(tokio::task::spawn_blocking(move || adapter.info()));
+    }
+
+    let mut results = Vec::new();
+    for handle in handles {
+        if let Ok(info) = handle.await {
+            results.push(info);
+        }
+    }
+    results
 }
 
 #[tauri::command]

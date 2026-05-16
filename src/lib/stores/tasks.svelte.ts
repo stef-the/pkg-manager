@@ -231,6 +231,7 @@ export function dismissTask(id: string): void {
 }
 
 export function elapsed(task: RunningTask): string {
+	void tick; // reactive dependency — forces recalc every second
 	const ms = Date.now() - task.startedAt;
 	const s = Math.floor(ms / 1000);
 	if (s < 60) return `${s}s`;

@@ -128,70 +128,73 @@ export function loadAllPackages(force = false): void {
 	loadingOutdated = true;
 	error = null;
 
-	// Detect managers (fast)
-	runTask('Detecting package managers', async () => {
-		await Promise.all([loadManagers(), loadSystemStats()]);
-	}, {
-		onSuccess: () => {
-			const available = managers.filter((m) => m.available);
+	// Fire everything concurrently — don't wait for manager detection
+	loadSystemStats();
 
-			if (available.length === 0) {
-				loading = false;
-				loadingOutdated = false;
-				lastRefreshed = new Date();
-				return;
-			}
-
-			// Track how many installed/outdated loads are pending
-			let installedPending = available.length;
-			let outdatedPending = available.length;
-
-			// Load installed packages per manager (each as its own task)
-			for (const m of available) {
-				const name = m.id === 'brew' ? 'Homebrew' : 'npm';
-				runTask(`Loading ${name} packages`, async () => {
-					await loadPackagesForManager(m.id as PackageManager);
-				}, {
-					onSuccess: () => {
-						installedPending--;
-						if (installedPending <= 0) {
-							loading = false;
-							lastRefreshed = new Date();
-						}
-					},
-					onError: () => {
-						installedPending--;
-						if (installedPending <= 0) {
-							loading = false;
-							lastRefreshed = new Date();
-						}
-					}
-				});
-			}
-
-			// Load outdated per manager (each as its own task, independent)
-			for (const m of available) {
-				const name = m.id === 'brew' ? 'Homebrew' : 'npm';
-				runTask(`Checking ${name} outdated`, async () => {
-					await loadOutdatedForManager(m.id as PackageManager);
-				}, {
-					onSuccess: () => {
-						outdatedPending--;
-						if (outdatedPending <= 0) loadingOutdated = false;
-					},
-					onError: () => {
-						outdatedPending--;
-						if (outdatedPending <= 0) loadingOutdated = false;
-					}
-				});
-			}
-		},
-		onError: (e) => {
+	// Detect managers then load packages for available ones
+	(async () => {
+		try {
+			await loadManagers();
+		} catch (e) {
 			error = `${e}`;
 			loading = false;
 			loadingOutdated = false;
+			return;
 		}
-	});
+
+		const available = managers.filter((m) => m.available);
+
+		if (available.length === 0) {
+			loading = false;
+			loadingOutdated = false;
+			lastRefreshed = new Date();
+			return;
+		}
+
+		// Track how many installed/outdated loads are pending
+		let installedPending = available.length;
+		let outdatedPending = available.length;
+
+		// Fire ALL package loads concurrently (each runs on its own thread in Rust)
+		for (const m of available) {
+			const name = m.name || m.id;
+			runTask(`Loading ${name}`, async () => {
+				await loadPackagesForManager(m.id as PackageManager);
+			}, {
+				onSuccess: () => {
+					installedPending--;
+					if (installedPending <= 0) {
+						loading = false;
+						lastRefreshed = new Date();
+					}
+				},
+				onError: () => {
+					installedPending--;
+					if (installedPending <= 0) {
+						loading = false;
+						lastRefreshed = new Date();
+					}
+				}
+			});
+		}
+
+		// Fire ALL outdated checks concurrently
+		for (const m of available) {
+			const name = m.name || m.id;
+			runTask(`Checking ${name} outdated`, async () => {
+				await loadOutdatedForManager(m.id as PackageManager);
+			}, {
+				onSuccess: () => {
+					outdatedPending--;
+					if (outdatedPending <= 0) loadingOutdated = false;
+				},
+				onError: () => {
+					outdatedPending--;
+					if (outdatedPending <= 0) loadingOutdated = false;
+				}
+			});
+		}
+	})();
 }
 
 export function refreshPackages(): void {

@@ -326,7 +326,7 @@
 
 	<!-- Activity — always visible at bottom -->
 	{#if getTasks().length > 0}
-		<div class="flex max-h-[40%] flex-col gap-2 overflow-y-auto border-t px-4 py-3" style="border-color: var(--border-subtle);">
+		<div class="flex min-h-[120px] flex-col gap-2 overflow-y-auto border-t px-4 py-3" style="border-color: var(--border-subtle);">
 			<span class="text-[10px] font-medium uppercase tracking-wider" style="color: var(--text-muted);">
 				Activity
 			</span>
