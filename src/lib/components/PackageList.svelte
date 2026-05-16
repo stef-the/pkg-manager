@@ -52,16 +52,20 @@
 	})());
 
 	function managerColor(id: string): string {
-		switch (id) {
-			case 'brew': return 'var(--color-nord7)';
-			case 'npm': return 'var(--color-nord11)';
-			case 'winget': return 'var(--color-nord9)';
-			default: return 'var(--text-muted)';
-		}
+		const colors: Record<string, string> = {
+			brew: 'var(--color-nord7)', npm: 'var(--color-nord11)', winget: 'var(--color-nord9)',
+			mas: 'var(--color-nord10)', pip: 'var(--color-nord13)', cargo: 'var(--color-nord12)',
+			apt: 'var(--color-nord15)', flatpak: 'var(--color-nord14)', snap: 'var(--color-nord8)'
+		};
+		return colors[id] ?? 'var(--text-muted)';
 	}
 
-	function managerLabel(id: string): string {
-		return id === 'brew' ? 'brew' : 'npm';
+	function managerIconName(id: string): import('./Icons.svelte').IconName {
+		const map: Record<string, import('./Icons.svelte').IconName> = {
+			brew: 'brew', npm: 'npm', winget: 'winget', mas: 'mas',
+			pip: 'pip', cargo: 'cargo', apt: 'apt', flatpak: 'flatpak', snap: 'snap'
+		};
+		return map[id] ?? 'installed';
 	}
 </script>
 
@@ -92,10 +96,12 @@
 	{/if}
 
 	{#if viewMode === 'list'}
-		<!-- Column Headers -->
+		<!-- Column Headers — matches row layout: icon(w-4) + gap + name(w-36) + gap + version(w-24) + gap + desc(flex-1) + gap + badges -->
 		<div class="flex items-center gap-4 border-b px-4 py-1.5" style="border-color: var(--border-subtle);">
+			<!-- Icon spacer -->
+			<span class="w-4 flex-shrink-0"></span>
 			<button
-				class="flex w-40 items-center gap-1 text-left text-[10px] font-medium uppercase tracking-wider transition-colors duration-100"
+				class="flex w-36 items-center gap-1 text-left text-[10px] font-medium uppercase tracking-wider transition-colors duration-100"
 				style="color: var(--text-muted);"
 				onclick={() => toggleSort('name')}
 			>
@@ -120,11 +126,11 @@
 			</button>
 			<span class="flex-1 text-[10px] font-medium uppercase tracking-wider" style="color: var(--text-muted);">Description</span>
 			<button
-				class="flex w-14 items-center justify-end gap-1 text-right text-[10px] font-medium uppercase tracking-wider transition-colors duration-100"
-				style="color: var(--text-muted);"
+				class="flex items-center justify-end gap-1 text-right text-[10px] font-medium uppercase tracking-wider transition-colors duration-100"
+				style="color: var(--text-muted); min-width: 60px;"
 				onclick={() => toggleSort('manager')}
 			>
-				Mgr
+				Source
 				{#if sortKey === 'manager'}
 					<svg width="8" height="8" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
 						{#if sortDir === 'asc'}<path d="M4 10l4-5 4 5" />{:else}<path d="M4 6l4 5 4-5" />{/if}
@@ -152,7 +158,7 @@
 				>
 					<!-- Manager icon -->
 					<span class="flex h-4 w-4 flex-shrink-0 items-center justify-center" style={isSelected ? '' : 'opacity: 0.4;'}>
-						<Icon name={pkg.manager === 'brew' ? 'brew' : pkg.manager === 'winget' ? 'winget' : 'npm'} size={14} />
+						<Icon name={managerIconName(pkg.manager)} size={14} />
 					</span>
 
 					<span
@@ -193,7 +199,7 @@
 								? 'background-color: var(--bg-primary); color: var(--accent);'
 								: `background-color: ${managerColor(pkg.manager)}22; color: ${managerColor(pkg.manager)};`}
 						>
-							{managerLabel(pkg.manager)}
+							{pkg.manager || 'unknown'}
 						</span>
 					</div>
 				</button>
@@ -218,7 +224,7 @@
 					<div class="flex items-start justify-between">
 						<div class="flex items-center gap-2">
 							<span class="flex h-4 w-4 flex-shrink-0 items-center justify-center" style={isSelected ? '' : 'opacity: 0.4;'}>
-								<Icon name={pkg.manager === 'brew' ? 'brew' : pkg.manager === 'winget' ? 'winget' : 'npm'} size={16} />
+								<Icon name={managerIconName(pkg.manager)} size={16} />
 							</span>
 							<span class="text-[13px] font-semibold" style={isSelected ? '' : 'color: var(--text-primary);'}>
 								{pkg.name}
@@ -251,7 +257,7 @@
 								? 'background-color: var(--bg-primary); color: var(--accent);'
 								: `background-color: ${managerColor(pkg.manager)}22; color: ${managerColor(pkg.manager)};`}
 						>
-							{managerLabel(pkg.manager)}
+							{pkg.manager || 'unknown'}
 						</span>
 					</div>
 				</button>
