@@ -20,6 +20,7 @@
 		{ id: 'outdated', label: 'Outdated', icon: 'outdated' },
 		{ id: 'browse', label: 'Browse', icon: 'browse' },
 		{ id: 'search', label: 'Search', icon: 'search' },
+		{ id: 'apps', label: 'Apps', icon: 'installed' },
 		{ id: 'managers', label: 'Managers', icon: 'managers' }
 	];
 

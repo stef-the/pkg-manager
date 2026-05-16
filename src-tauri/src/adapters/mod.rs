@@ -3,8 +3,10 @@ pub mod brew;
 pub mod cargo;
 pub mod flatpak;
 pub mod mas;
+pub mod nix;
 pub mod npm;
 pub mod pip;
+pub mod scoop;
 pub mod snap;
 pub mod winget;
 
@@ -36,6 +38,8 @@ pub fn get_adapter(manager: &str) -> Result<Box<dyn PackageManagerAdapter>, AppE
         "apt" => Ok(Box::new(apt::AptAdapter)),
         "flatpak" => Ok(Box::new(flatpak::FlatpakAdapter)),
         "snap" => Ok(Box::new(snap::SnapAdapter)),
+        "nix" => Ok(Box::new(nix::NixAdapter)),
+        "scoop" => Ok(Box::new(scoop::ScoopAdapter)),
         _ => Err(AppError::ManagerNotFound(manager.to_string())),
     }
 }
@@ -51,6 +55,8 @@ pub fn get_all_adapters() -> Vec<Box<dyn PackageManagerAdapter>> {
         Box::new(apt::AptAdapter),
         Box::new(flatpak::FlatpakAdapter),
         Box::new(snap::SnapAdapter),
+        Box::new(nix::NixAdapter),
+        Box::new(scoop::ScoopAdapter),
     ]
 }
 

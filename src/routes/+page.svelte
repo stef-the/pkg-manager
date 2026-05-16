@@ -11,6 +11,7 @@
 	import LogsView from '$lib/components/views/LogsView.svelte';
 	import TerminalView from '$lib/components/views/TerminalView.svelte';
 	import HistoryView from '$lib/components/views/HistoryView.svelte';
+	import AppsView from '$lib/components/views/AppsView.svelte';
 	import {
 		getActiveView, setActiveView, setActiveManagerFilter,
 		loadAllPackages, getTotalOutdatedCount, getAllPackages
@@ -72,4 +73,6 @@
 	<TerminalView />
 {:else if getActiveView() === 'history'}
 	<HistoryView />
+{:else if getActiveView() === 'apps'}
+	<AppsView />
 {/if}

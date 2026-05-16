@@ -1,4 +1,5 @@
 mod adapters;
+mod apps;
 mod commands;
 mod error;
 mod models;
@@ -61,6 +62,8 @@ pub fn run() {
             commands::append_history,
             commands::read_history,
             commands::send_notification,
+            commands::scan_installed_apps,
+            commands::uninstall_app,
             commands::set_window_title,
             commands::set_tray_tooltip,
             commands::save_window_state,

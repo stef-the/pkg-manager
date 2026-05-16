@@ -1,4 +1,4 @@
-export type PackageManager = 'brew' | 'npm' | 'winget' | 'mas' | 'pip' | 'cargo' | 'apt' | 'flatpak' | 'snap';
+export type PackageManager = 'brew' | 'npm' | 'winget' | 'mas' | 'pip' | 'cargo' | 'apt' | 'flatpak' | 'snap' | 'nix' | 'scoop';
 
 export interface Package {
 	name: string;
@@ -58,7 +58,8 @@ export type ViewId =
 	| 'logs'
 	| 'terminal'
 	| 'debloat'
-	| 'history';
+	| 'history'
+	| 'apps';
 
 export interface ToastItem {
 	id: string;

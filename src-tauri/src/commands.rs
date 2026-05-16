@@ -597,6 +597,68 @@ pub fn load_window_state(app_handle: tauri::AppHandle) -> Result<String, String>
     std::fs::read_to_string(&path).map_err(|e| e.to_string())
 }
 
+// --- App Scanner ---
+
+#[tauri::command]
+pub fn scan_installed_apps() -> Vec<crate::apps::InstalledApp> {
+    log::info!("Command: scan_installed_apps");
+    crate::apps::scan_apps()
+}
+
+#[tauri::command]
+pub fn uninstall_app(path: String) -> Result<(), String> {
+    log::info!("Command: uninstall_app({})", path);
+    let app_path = std::path::Path::new(&path);
+
+    if !app_path.exists() {
+        return Err(format!("Path not found: {}", path));
+    }
+
+    #[cfg(target_os = "macos")]
+    {
+        // Move to Trash on macOS
+        std::process::Command::new("osascript")
+            .args(["-e", &format!(
+                "tell application \"Finder\" to delete POSIX file \"{}\"", path
+            )])
+            .stdin(std::process::Stdio::null())
+            .output()
+            .map_err(|e| format!("Failed to move to Trash: {}", e))?;
+        return Ok(());
+    }
+
+    #[cfg(target_os = "linux")]
+    {
+        // Try gio trash first, fallback to rm
+        let result = std::process::Command::new("gio")
+            .args(["trash", &path])
+            .stdin(std::process::Stdio::null())
+            .output();
+        if result.is_ok() {
+            return Ok(());
+        }
+        return Err("Cannot uninstall — try removing from your package manager".to_string());
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        // On Windows, run the uninstall string from registry
+        // The path field would contain the uninstall command
+        if !path.is_empty() {
+            std::process::Command::new("cmd")
+                .args(["/C", &path])
+                .stdin(std::process::Stdio::null())
+                .spawn()
+                .map_err(|e| format!("Failed to run uninstaller: {}", e))?;
+            return Ok(());
+        }
+        return Err("No uninstall command available".to_string());
+    }
+
+    #[cfg(not(any(target_os = "macos", target_os = "linux", target_os = "windows")))]
+    Err("Uninstall not supported on this platform".to_string())
+}
+
 #[tauri::command]
 pub fn get_system_stats() -> SystemStats {
     log::info!("Command: get_system_stats");
