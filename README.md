@@ -44,9 +44,19 @@ curl -L https://github.com/stef-the/pkg-manager/releases/latest/download/pkg-man
 curl -L https://github.com/stef-the/pkg-manager/releases/latest/download/pkg-manager_0.1.0_amd64.AppImage -o ~/.local/bin/pkg-manager && chmod +x ~/.local/bin/pkg-manager && ~/.local/bin/pkg-manager
 ```
 
-#### Windows
+#### Windows (PowerShell)
 
-Download and run the installer: [Pkg Manager_0.1.0_x64-setup.exe](https://github.com/stef-the/pkg-manager/releases/latest/download/Pkg.Manager_0.1.0_x64-setup.exe)
+```powershell
+Invoke-WebRequest -Uri "https://github.com/stef-the/pkg-manager/releases/latest/download/Pkg.Manager_0.1.0_x64-setup.exe" -OutFile "$env:TEMP\PkgManagerSetup.exe"; Start-Process "$env:TEMP\PkgManagerSetup.exe" -Wait
+```
+
+#### Windows (winget)
+
+```powershell
+winget install stef-the.PkgManager
+```
+
+> *winget source coming soon — for now use the PowerShell command above.*
 
 ## Features
 
