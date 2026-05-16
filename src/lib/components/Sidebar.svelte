@@ -43,16 +43,12 @@
 	}
 
 	function managerIconName(id: string): IconName {
-		switch (id) {
-			case 'brew': return 'brew';
-			case 'npm': return 'npm';
-			case 'winget': return 'winget';
-			case 'mas': return 'mas';
-			case 'pip': return 'pip';
-			case 'cargo': return 'cargo';
-			case 'apt': return 'apt';
-			default: return 'installed';
-		}
+		const map: Record<string, IconName> = {
+			brew: 'brew', npm: 'npm', winget: 'winget', mas: 'mas',
+			pip: 'pip', cargo: 'cargo', apt: 'apt', flatpak: 'flatpak',
+			snap: 'snap', nix: 'nix', scoop: 'scoop'
+		};
+		return map[id] ?? 'installed';
 	}
 
 	let menuManager = $state<ManagerInfo | null>(null);

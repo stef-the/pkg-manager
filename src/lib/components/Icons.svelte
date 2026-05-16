@@ -26,6 +26,8 @@
 		| 'apt'
 		| 'flatpak'
 		| 'snap'
+		| 'nix'
+		| 'scoop'
 		| 'browse'
 		| 'managers';
 </script>
@@ -159,6 +161,19 @@
 		<!-- Snap — S-like -->
 		<circle cx="8" cy="8" r="6" fill="currentColor" stroke="none" />
 		<path d="M5.5 6.5l5-1v4.5l-5 1z" fill="var(--bg-secondary)" stroke="none" />
+	{:else if name === 'nix'}
+		<!-- Nix snowflake -->
+		<path d="M8 2l2 3.5L8 6 6 5.5 8 2z" fill="currentColor" stroke="none" />
+		<path d="M12.5 5L11 8.5 9 8l-.5-2.5L12.5 5z" fill="currentColor" stroke="none" />
+		<path d="M12.5 11l-3.5-.5L8 8.5l2-1 4.5 3.5z" fill="currentColor" stroke="none" opacity="0.8" />
+		<path d="M8 14l-2-3.5L8 10l2 .5L8 14z" fill="currentColor" stroke="none" />
+		<path d="M3.5 11l1.5-3.5 2 .5.5 2.5L3.5 11z" fill="currentColor" stroke="none" opacity="0.8" />
+		<path d="M3.5 5l3.5.5L8 7.5l-2 1L3.5 5z" fill="currentColor" stroke="none" />
+	{:else if name === 'scoop'}
+		<!-- Scoop bucket -->
+		<path d="M4 4h8l-1 9H5L4 4z" fill="currentColor" stroke="none" />
+		<path d="M3 3h10v1.5H3z" fill="currentColor" stroke="none" opacity="0.7" />
+		<rect x="7" y="1" width="2" height="2.5" rx="0.5" fill="currentColor" stroke="none" opacity="0.5" />
 	{:else if name === 'browse'}
 		<!-- Compass / browse -->
 		<circle cx="8" cy="8" r="6" />

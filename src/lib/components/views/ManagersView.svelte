@@ -47,6 +47,10 @@
 				return { name: 'winget', icon: 'winget', description: 'Windows Package Manager from Microsoft', installUrl: 'https://learn.microsoft.com/en-us/windows/package-manager/', platforms: ['windows'] };
 			case 'apt':
 				return { name: 'apt', icon: 'apt', description: 'Debian/Ubuntu package manager (native or via WSL)', installUrl: 'https://wiki.debian.org/Apt', platforms: ['linux', 'windows'] };
+			case 'nix':
+				return { name: 'Nix', icon: 'nix', description: 'Reproducible package manager with 100,000+ packages', installUrl: 'https://nixos.org/download', platforms: ['macos', 'linux'] };
+			case 'scoop':
+				return { name: 'Scoop', icon: 'scoop', description: 'Windows command-line installer (no admin needed)', installUrl: 'https://scoop.sh', platforms: ['windows'] };
 			case 'flatpak':
 				return { name: 'Flatpak', icon: 'flatpak', description: 'Linux app sandboxing and distribution framework', installUrl: 'https://flatpak.org/setup/', platforms: ['linux'] };
 			case 'snap':
@@ -71,7 +75,7 @@
 		switch (p) { case 'macos': return 'macOS'; case 'windows': return 'Windows'; case 'linux': return 'Linux'; }
 	}
 
-	const knownManagers = ['brew', 'npm', 'mas', 'pip', 'cargo', 'winget', 'apt', 'flatpak', 'snap'];
+	const knownManagers = ['brew', 'npm', 'mas', 'pip', 'cargo', 'nix', 'scoop', 'winget', 'apt', 'flatpak', 'snap'];
 	const detectedManagers = $derived(getManagers());
 	const detectedIds = $derived(new Set(detectedManagers.map((m) => m.id)));
 </script>

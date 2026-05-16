@@ -19,7 +19,8 @@
 	function managerIcon(id: string): IconName {
 		const map: Record<string, IconName> = {
 			brew: 'brew', npm: 'npm', winget: 'winget', mas: 'mas',
-			pip: 'pip', cargo: 'cargo', apt: 'apt', flatpak: 'flatpak', snap: 'snap'
+			pip: 'pip', cargo: 'cargo', apt: 'apt', flatpak: 'flatpak',
+			snap: 'snap', nix: 'nix', scoop: 'scoop'
 		};
 		return map[id] ?? 'installed';
 	}

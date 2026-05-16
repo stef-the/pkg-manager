@@ -10,11 +10,11 @@ Download the latest release for your platform:
 
 | Platform | Download |
 |----------|----------|
-| macOS (Apple Silicon) | [Pkg Manager_0.1.0_aarch64.dmg](https://github.com/stef-the/pkg-manager/releases/latest/download/Pkg.Manager_0.1.0_aarch64.dmg) |
-| macOS (Intel) | [Pkg Manager_0.1.0_x64.dmg](https://github.com/stef-the/pkg-manager/releases/latest/download/Pkg.Manager_0.1.0_x64.dmg) |
-| Windows | [Pkg Manager_0.1.0_x64-setup.exe](https://github.com/stef-the/pkg-manager/releases/latest/download/Pkg.Manager_0.1.0_x64-setup.exe) |
-| Linux (deb) | [pkg-manager_0.1.0_amd64.deb](https://github.com/stef-the/pkg-manager/releases/latest/download/pkg-manager_0.1.0_amd64.deb) |
-| Linux (AppImage) | [pkg-manager_0.1.0_amd64.AppImage](https://github.com/stef-the/pkg-manager/releases/latest/download/pkg-manager_0.1.0_amd64.AppImage) |
+| macOS (Apple Silicon) | [Pkg Manager_0.2.0_aarch64.dmg](https://github.com/stef-the/pkg-manager/releases/latest/download/Pkg.Manager_0.2.0_aarch64.dmg) |
+| macOS (Intel) | [Pkg Manager_0.2.0_x64.dmg](https://github.com/stef-the/pkg-manager/releases/latest/download/Pkg.Manager_0.2.0_x64.dmg) |
+| Windows | [Pkg Manager_0.2.0_x64-setup.exe](https://github.com/stef-the/pkg-manager/releases/latest/download/Pkg.Manager_0.2.0_x64-setup.exe) |
+| Linux (deb) | [pkg-manager_0.2.0_amd64.deb](https://github.com/stef-the/pkg-manager/releases/latest/download/pkg-manager_0.2.0_amd64.deb) |
+| Linux (AppImage) | [pkg-manager_0.2.0_amd64.AppImage](https://github.com/stef-the/pkg-manager/releases/latest/download/pkg-manager_0.2.0_amd64.AppImage) |
 
 Or check the [Releases page](https://github.com/stef-the/pkg-manager/releases) for all options.
 
@@ -23,31 +23,31 @@ Or check the [Releases page](https://github.com/stef-the/pkg-manager/releases) f
 #### macOS (Apple Silicon)
 
 ```bash
-curl -L https://github.com/stef-the/pkg-manager/releases/latest/download/Pkg.Manager_0.1.0_aarch64.dmg -o /tmp/PkgManager.dmg && hdiutil attach /tmp/PkgManager.dmg && cp -R "/Volumes/Pkg Manager/Pkg Manager.app" /Applications/ && hdiutil detach "/Volumes/Pkg Manager" && xattr -cr "/Applications/Pkg Manager.app" && open "/Applications/Pkg Manager.app"
+curl -L https://github.com/stef-the/pkg-manager/releases/latest/download/Pkg.Manager_0.2.0_aarch64.dmg -o /tmp/PkgManager.dmg && hdiutil attach /tmp/PkgManager.dmg && cp -R "/Volumes/Pkg Manager/Pkg Manager.app" /Applications/ && hdiutil detach "/Volumes/Pkg Manager" && xattr -cr "/Applications/Pkg Manager.app" && open "/Applications/Pkg Manager.app"
 ```
 
 #### macOS (Intel)
 
 ```bash
-curl -L https://github.com/stef-the/pkg-manager/releases/latest/download/Pkg.Manager_0.1.0_x64.dmg -o /tmp/PkgManager.dmg && hdiutil attach /tmp/PkgManager.dmg && cp -R "/Volumes/Pkg Manager/Pkg Manager.app" /Applications/ && hdiutil detach "/Volumes/Pkg Manager" && xattr -cr "/Applications/Pkg Manager.app" && open "/Applications/Pkg Manager.app"
+curl -L https://github.com/stef-the/pkg-manager/releases/latest/download/Pkg.Manager_0.2.0_x64.dmg -o /tmp/PkgManager.dmg && hdiutil attach /tmp/PkgManager.dmg && cp -R "/Volumes/Pkg Manager/Pkg Manager.app" /Applications/ && hdiutil detach "/Volumes/Pkg Manager" && xattr -cr "/Applications/Pkg Manager.app" && open "/Applications/Pkg Manager.app"
 ```
 
 #### Linux (Debian / Ubuntu)
 
 ```bash
-curl -L https://github.com/stef-the/pkg-manager/releases/latest/download/pkg-manager_0.1.0_amd64.deb -o /tmp/pkg-manager.deb && sudo dpkg -i /tmp/pkg-manager.deb && pkg-manager
+curl -L https://github.com/stef-the/pkg-manager/releases/latest/download/pkg-manager_0.2.0_amd64.deb -o /tmp/pkg-manager.deb && sudo dpkg -i /tmp/pkg-manager.deb && pkg-manager
 ```
 
 #### Linux (AppImage)
 
 ```bash
-curl -L https://github.com/stef-the/pkg-manager/releases/latest/download/pkg-manager_0.1.0_amd64.AppImage -o ~/.local/bin/pkg-manager && chmod +x ~/.local/bin/pkg-manager && ~/.local/bin/pkg-manager
+curl -L https://github.com/stef-the/pkg-manager/releases/latest/download/pkg-manager_0.2.0_amd64.AppImage -o ~/.local/bin/pkg-manager && chmod +x ~/.local/bin/pkg-manager && ~/.local/bin/pkg-manager
 ```
 
 #### Windows (PowerShell)
 
 ```powershell
-Invoke-WebRequest -Uri "https://github.com/stef-the/pkg-manager/releases/latest/download/Pkg.Manager_0.1.0_x64-setup.exe" -OutFile "$env:TEMP\PkgManagerSetup.exe"; Start-Process "$env:TEMP\PkgManagerSetup.exe" -Wait
+Invoke-WebRequest -Uri "https://github.com/stef-the/pkg-manager/releases/latest/download/Pkg.Manager_0.2.0_x64-setup.exe" -OutFile "$env:TEMP\PkgManagerSetup.exe"; Start-Process "$env:TEMP\PkgManagerSetup.exe" -Wait
 ```
 
 #### Windows (winget)

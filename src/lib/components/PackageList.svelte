@@ -55,7 +55,8 @@
 		const colors: Record<string, string> = {
 			brew: 'var(--color-nord7)', npm: 'var(--color-nord11)', winget: 'var(--color-nord9)',
 			mas: 'var(--color-nord10)', pip: 'var(--color-nord13)', cargo: 'var(--color-nord12)',
-			apt: 'var(--color-nord15)', flatpak: 'var(--color-nord14)', snap: 'var(--color-nord8)'
+			apt: 'var(--color-nord15)', flatpak: 'var(--color-nord14)', snap: 'var(--color-nord8)',
+			nix: 'var(--color-nord9)', scoop: 'var(--color-nord7)'
 		};
 		return colors[id] ?? 'var(--text-muted)';
 	}
@@ -63,7 +64,8 @@
 	function managerIconName(id: string): import('./Icons.svelte').IconName {
 		const map: Record<string, import('./Icons.svelte').IconName> = {
 			brew: 'brew', npm: 'npm', winget: 'winget', mas: 'mas',
-			pip: 'pip', cargo: 'cargo', apt: 'apt', flatpak: 'flatpak', snap: 'snap'
+			pip: 'pip', cargo: 'cargo', apt: 'apt', flatpak: 'flatpak',
+			snap: 'snap', nix: 'nix', scoop: 'scoop'
 		};
 		return map[id] ?? 'installed';
 	}

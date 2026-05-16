@@ -24,7 +24,8 @@
 	function managerIcon(id: string): IconName {
 		const map: Record<string, IconName> = {
 			brew: 'brew', npm: 'npm', winget: 'winget', mas: 'mas',
-			pip: 'pip', cargo: 'cargo', apt: 'apt', flatpak: 'flatpak', snap: 'snap'
+			pip: 'pip', cargo: 'cargo', apt: 'apt', flatpak: 'flatpak',
+			snap: 'snap', nix: 'nix', scoop: 'scoop'
 		};
 		return map[id] ?? 'installed';
 	}
@@ -40,6 +41,8 @@
 			case 'apt': return 'https://packages.ubuntu.com';
 			case 'flatpak': return 'https://flathub.org';
 			case 'snap': return 'https://snapcraft.io';
+			case 'nix': return 'https://search.nixos.org/packages';
+			case 'scoop': return 'https://scoop.sh';
 			default: return '';
 		}
 	}
