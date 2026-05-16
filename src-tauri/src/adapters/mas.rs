@@ -146,6 +146,23 @@ impl PackageManagerAdapter for MasAdapter {
             name.split('|').last().unwrap_or(name)
         } else if name.chars().all(|c| c.is_ascii_digit()) {
             name
+        } else if name == "all" {
+            // Update all — use mas upgrade without args
+            log::info!("Updating all Mac App Store apps");
+            return match run_command("mas", &["upgrade"]) {
+                Ok(_) => Ok(()),
+                Err(e) => {
+                    let msg = e.to_string();
+                    if msg.contains("sign in") || msg.contains("Password") || msg.contains("authentication") {
+                        Err(AppError::CommandFailed {
+                            cmd: "mas upgrade".to_string(),
+                            stderr: "Mac App Store requires sign-in. Open App Store app and sign in first.".to_string(),
+                        })
+                    } else {
+                        Err(e)
+                    }
+                }
+            };
         } else {
             // Try to find the ID from the installed list
             if let Ok(output) = run_command("mas", &["list"]) {
@@ -164,7 +181,24 @@ impl PackageManagerAdapter for MasAdapter {
             });
         };
         log::info!("Updating Mac App Store app ID: {}", app_id);
-        run_command("mas", &["upgrade", app_id])?;
-        Ok(())
+        match run_command("mas", &["upgrade", app_id]) {
+            Ok(_) => Ok(()),
+            Err(e) => {
+                let msg = e.to_string();
+                if msg.contains("sign in") || msg.contains("Password") || msg.contains("authentication") || msg.contains("ISErrorDomain") {
+                    Err(AppError::CommandFailed {
+                        cmd: format!("mas upgrade {}", app_id),
+                        stderr: "Update failed — Mac App Store may require sign-in or the app doesn't support CLI updates. Try updating from the App Store app directly.".to_string(),
+                    })
+                } else if msg.contains("Unknown Error") || msg.contains("ADAM ID") {
+                    Err(AppError::CommandFailed {
+                        cmd: format!("mas upgrade {}", app_id),
+                        stderr: "This app cannot be updated via CLI. Try the App Store app.".to_string(),
+                    })
+                } else {
+                    Err(e)
+                }
+            }
+        }
     }
 }

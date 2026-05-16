@@ -60,16 +60,18 @@ pub fn command_exists(name: &str) -> bool {
     run_command(check_cmd, &[name]).is_ok()
 }
 
-/// Run a shell command with a 5-minute timeout and return its stdout.
-/// Logs the command, and on failure logs stderr.
+/// Run a shell command with a 90-second timeout. Returns stdout on success.
+/// Stdin is closed to prevent interactive prompts from hanging.
 pub fn run_command(program: &str, args: &[&str]) -> Result<String, AppError> {
     let cmd_str = format!("{} {}", program, args.join(" "));
     log::debug!("Running command: {}", cmd_str);
 
-    let output = Command::new(program)
+    let mut child = Command::new(program)
         .args(args)
         .stdin(std::process::Stdio::null())
-        .output()
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped())
+        .spawn()
         .map_err(|e| {
             log::error!("Failed to execute '{}': {}", cmd_str, e);
             AppError::CommandFailed {
@@ -78,11 +80,43 @@ pub fn run_command(program: &str, args: &[&str]) -> Result<String, AppError> {
             }
         })?;
 
+    // Wait with 90 second timeout
+    let timeout = std::time::Duration::from_secs(90);
+    let start = std::time::Instant::now();
+
+    loop {
+        match child.try_wait() {
+            Ok(Some(_status)) => break,
+            Ok(None) => {
+                if start.elapsed() > timeout {
+                    let _ = child.kill();
+                    log::error!("Command '{}' timed out after 90s", cmd_str);
+                    return Err(AppError::CommandFailed {
+                        cmd: cmd_str,
+                        stderr: "Command timed out after 90 seconds".to_string(),
+                    });
+                }
+                std::thread::sleep(std::time::Duration::from_millis(100));
+            }
+            Err(e) => {
+                return Err(AppError::CommandFailed {
+                    cmd: cmd_str,
+                    stderr: format!("Failed to wait for process: {}", e),
+                });
+            }
+        }
+    }
+
+    let output = child.wait_with_output().map_err(|e| {
+        AppError::CommandFailed {
+            cmd: cmd_str.clone(),
+            stderr: e.to_string(),
+        }
+    })?;
+
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr).to_string();
         log::warn!("Command '{}' exited with {}: {}", cmd_str, output.status, stderr);
-        // Some commands return non-zero but still have useful stdout (e.g., npm outdated)
-        // We'll return the error but callers can choose to handle this
         return Err(AppError::CommandFailed {
             cmd: cmd_str,
             stderr,
@@ -95,14 +129,17 @@ pub fn run_command(program: &str, args: &[&str]) -> Result<String, AppError> {
 }
 
 /// Like run_command but returns stdout even on non-zero exit (useful for npm outdated).
+/// Also has a 90-second timeout.
 pub fn run_command_allow_failure(program: &str, args: &[&str]) -> Result<String, AppError> {
     let cmd_str = format!("{} {}", program, args.join(" "));
     log::debug!("Running command (allow failure): {}", cmd_str);
 
-    let output = Command::new(program)
+    let mut child = Command::new(program)
         .args(args)
         .stdin(std::process::Stdio::null())
-        .output()
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped())
+        .spawn()
         .map_err(|e| {
             log::error!("Failed to execute '{}': {}", cmd_str, e);
             AppError::CommandFailed {
@@ -110,6 +147,36 @@ pub fn run_command_allow_failure(program: &str, args: &[&str]) -> Result<String,
                 stderr: e.to_string(),
             }
         })?;
+
+    let timeout = std::time::Duration::from_secs(90);
+    let start = std::time::Instant::now();
+
+    loop {
+        match child.try_wait() {
+            Ok(Some(_)) => break,
+            Ok(None) => {
+                if start.elapsed() > timeout {
+                    let _ = child.kill();
+                    log::error!("Command '{}' timed out after 90s (allow_failure)", cmd_str);
+                    return Err(AppError::CommandFailed {
+                        cmd: cmd_str,
+                        stderr: "Command timed out after 90 seconds".to_string(),
+                    });
+                }
+                std::thread::sleep(std::time::Duration::from_millis(100));
+            }
+            Err(e) => {
+                return Err(AppError::CommandFailed {
+                    cmd: cmd_str,
+                    stderr: format!("Failed to wait for process: {}", e),
+                });
+            }
+        }
+    }
+
+    let output = child.wait_with_output().map_err(|e| {
+        AppError::CommandFailed { cmd: cmd_str.clone(), stderr: e.to_string() }
+    })?;
 
     let stdout = String::from_utf8_lossy(&output.stdout).to_string();
     if !output.status.success() {
