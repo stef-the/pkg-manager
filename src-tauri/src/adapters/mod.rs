@@ -68,6 +68,7 @@ pub fn run_command(program: &str, args: &[&str]) -> Result<String, AppError> {
 
     let output = Command::new(program)
         .args(args)
+        .stdin(std::process::Stdio::null())
         .output()
         .map_err(|e| {
             log::error!("Failed to execute '{}': {}", cmd_str, e);
@@ -100,6 +101,7 @@ pub fn run_command_allow_failure(program: &str, args: &[&str]) -> Result<String,
 
     let output = Command::new(program)
         .args(args)
+        .stdin(std::process::Stdio::null())
         .output()
         .map_err(|e| {
             log::error!("Failed to execute '{}': {}", cmd_str, e);
