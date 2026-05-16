@@ -21,29 +21,54 @@
 		});
 	}
 
-	function managerMeta(id: string): { name: string; icon: IconName; description: string; installUrl: string } {
+	type Platform = 'macos' | 'windows' | 'linux';
+
+	interface ManagerMeta {
+		name: string;
+		icon: IconName;
+		description: string;
+		installUrl: string;
+		platforms: Platform[];
+	}
+
+	function managerMeta(id: string): ManagerMeta {
 		switch (id) {
 			case 'brew':
-				return { name: 'Homebrew', icon: 'brew', description: 'The Missing Package Manager for macOS (or Linux)', installUrl: 'https://brew.sh' };
+				return { name: 'Homebrew', icon: 'brew', description: 'The Missing Package Manager for macOS (or Linux)', installUrl: 'https://brew.sh', platforms: ['macos', 'linux'] };
 			case 'npm':
-				return { name: 'npm', icon: 'npm', description: 'Node.js package manager for JavaScript', installUrl: 'https://nodejs.org' };
+				return { name: 'npm', icon: 'npm', description: 'Node.js package manager for JavaScript', installUrl: 'https://nodejs.org', platforms: ['macos', 'windows', 'linux'] };
 			case 'mas':
-				return { name: 'Mac App Store', icon: 'mas', description: 'Install and update Mac App Store apps from the command line', installUrl: 'https://github.com/mas-cli/mas' };
+				return { name: 'Mac App Store', icon: 'mas', description: 'Install and update Mac App Store apps from the command line', installUrl: 'https://github.com/mas-cli/mas', platforms: ['macos'] };
 			case 'pip':
-				return { name: 'pip (Python)', icon: 'pip', description: 'Package installer for Python', installUrl: 'https://pip.pypa.io' };
+				return { name: 'pip (Python)', icon: 'pip', description: 'Package installer for Python', installUrl: 'https://pip.pypa.io', platforms: ['macos', 'windows', 'linux'] };
 			case 'cargo':
-				return { name: 'Cargo (Rust)', icon: 'cargo', description: 'Rust package manager and build tool', installUrl: 'https://rustup.rs' };
+				return { name: 'Cargo (Rust)', icon: 'cargo', description: 'Rust package manager and build tool', installUrl: 'https://rustup.rs', platforms: ['macos', 'windows', 'linux'] };
 			case 'winget':
-				return { name: 'winget', icon: 'winget', description: 'Windows Package Manager from Microsoft', installUrl: 'https://learn.microsoft.com/en-us/windows/package-manager/' };
+				return { name: 'winget', icon: 'winget', description: 'Windows Package Manager from Microsoft', installUrl: 'https://learn.microsoft.com/en-us/windows/package-manager/', platforms: ['windows'] };
 			case 'apt':
-				return { name: 'apt', icon: 'apt', description: 'Debian/Ubuntu package manager (native or via WSL)', installUrl: 'https://learn.microsoft.com/en-us/windows/wsl/install' };
+				return { name: 'apt', icon: 'apt', description: 'Debian/Ubuntu package manager (native or via WSL)', installUrl: 'https://wiki.debian.org/Apt', platforms: ['linux', 'windows'] };
 			case 'flatpak':
-				return { name: 'Flatpak', icon: 'flatpak', description: 'Linux app sandboxing and distribution framework', installUrl: 'https://flatpak.org/setup/' };
+				return { name: 'Flatpak', icon: 'flatpak', description: 'Linux app sandboxing and distribution framework', installUrl: 'https://flatpak.org/setup/', platforms: ['linux'] };
 			case 'snap':
-				return { name: 'Snap', icon: 'snap', description: 'Universal Linux package format by Canonical', installUrl: 'https://snapcraft.io/docs/installing-snapd' };
+				return { name: 'Snap', icon: 'snap', description: 'Universal Linux package format by Canonical', installUrl: 'https://snapcraft.io/docs/installing-snapd', platforms: ['linux'] };
 			default:
-				return { name: id, icon: 'installed', description: '', installUrl: '' };
+				return { name: id, icon: 'installed', description: '', installUrl: '', platforms: ['macos', 'windows', 'linux'] };
 		}
+	}
+
+	function getCurrentPlatform(): Platform {
+		const ua = navigator.userAgent.toLowerCase();
+		if (ua.includes('mac')) return 'macos';
+		if (ua.includes('win')) return 'windows';
+		return 'linux';
+	}
+
+	function isCompatible(meta: ManagerMeta): boolean {
+		return meta.platforms.includes(getCurrentPlatform());
+	}
+
+	function platformLabel(p: Platform): string {
+		switch (p) { case 'macos': return 'macOS'; case 'windows': return 'Windows'; case 'linux': return 'Linux'; }
 	}
 
 	const knownManagers = ['brew', 'npm', 'mas', 'pip', 'cargo', 'winget', 'apt', 'flatpak', 'snap'];
@@ -90,12 +115,19 @@
 						{/if}
 					</div>
 					<p class="mt-0.5 text-[12px]" style="color: var(--text-muted);">{meta.description}</p>
-					{#if detected?.version}
-						<span class="mt-1 font-mono text-[11px]" style="color: var(--text-secondary);">{detected.version}</span>
-					{/if}
+					<div class="mt-1 flex items-center gap-2">
+						{#if detected?.version}
+							<span class="font-mono text-[10px]" style="color: var(--text-secondary);">{detected.version}</span>
+						{/if}
+						<div class="flex gap-1">
+							{#each meta.platforms as p}
+								<span class="rounded px-1 py-0.5 text-[8px] font-medium" style="background-color: var(--bg-tertiary); color: var(--text-muted);">{platformLabel(p)}</span>
+							{/each}
+						</div>
+					</div>
 				</div>
 
-				{#if !available}
+				{#if !available && isCompatible(meta)}
 					<div class="flex flex-shrink-0 gap-2">
 						<button
 							class="rounded-lg px-4 py-2 text-[13px] font-medium transition-colors duration-100 hover:opacity-90"
@@ -114,6 +146,10 @@
 							</button>
 						{/if}
 					</div>
+				{:else if !available && !isCompatible(meta)}
+					<span class="flex-shrink-0 rounded-lg px-3 py-1.5 text-[11px]" style="color: var(--text-muted);">
+						Not available on {platformLabel(getCurrentPlatform())}
+					</span>
 				{/if}
 			</div>
 		{/each}

@@ -212,10 +212,10 @@
 					</text>
 				{/if}
 			</svg>
-			<div class="flex flex-col gap-1">
+			<div class="flex flex-col items-start gap-1">
 				{#each donutSegments as seg}
 					<button
-						class="flex items-center gap-1.5 rounded px-1.5 py-0.5 transition-colors duration-75"
+						class="flex items-center gap-1.5 rounded px-1.5 py-0.5 text-left transition-colors duration-75"
 						style={hoveredSegment === seg.id ? `background-color: ${seg.color}22;` : ''}
 						onmouseenter={() => (hoveredSegment = seg.id)}
 						onmouseleave={() => (hoveredSegment = null)}

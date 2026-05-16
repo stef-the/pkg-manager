@@ -37,8 +37,14 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "android": {
-      "debugApplicationIdSuffix": ".debug"
+    "createUpdaterArtifacts": true
+  },
+  "plugins": {
+    "updater": {
+      "endpoints": [
+        "https://github.com/stef-the/pkg-manager/releases/latest/download/latest.json"
+      ],
+      "pubkey": ""
     }
   }
 }

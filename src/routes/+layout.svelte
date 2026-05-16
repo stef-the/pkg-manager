@@ -7,6 +7,8 @@
 	import Toast from '$lib/components/Toast.svelte';
 	import KeyboardHandler from '$lib/components/KeyboardHandler.svelte';
 	import CommandPalette from '$lib/components/CommandPalette.svelte';
+	import AppUpdater from '$lib/components/AppUpdater.svelte';
+	import { startAutoCheck } from '$lib/stores/autoupdate.svelte';
 
 	let paletteOpen = $state(false);
 
@@ -27,6 +29,9 @@
 
 	$effect(() => {
 		initTheme();
+
+		// Start auto-update checker
+		startAutoCheck();
 
 		// Listen for tray menu actions
 		if (typeof window !== 'undefined' && '__TAURI__' in window) {
@@ -52,7 +57,10 @@
 
 <ErrorBoundary>
 	<div class="flex h-screen overflow-hidden" style="background-color: var(--bg-primary);">
-		<Sidebar />
+		<div class="flex flex-col">
+			<Sidebar />
+			<AppUpdater />
+		</div>
 		<main class="flex min-w-0 flex-1 flex-col overflow-hidden">
 			{@render children()}
 		</main>

@@ -1,7 +1,16 @@
 <script lang="ts">
 	import { getThemePreference, setThemePreference, getDateFormat, setDateFormat } from '$lib/stores/theme.svelte';
+	import { getCheckInterval, setCheckInterval } from '$lib/stores/autoupdate.svelte';
 	import { createLogger } from '$lib/utils/logger';
 	import type { ThemeMode, DateFormat } from '$lib/types';
+
+	const intervalOptions = [
+		{ value: 0, label: 'Disabled' },
+		{ value: 30, label: 'Every 30 min' },
+		{ value: 60, label: 'Every hour' },
+		{ value: 240, label: 'Every 4 hours' },
+		{ value: 1440, label: 'Daily' }
+	];
 
 	const log = createLogger('preferences');
 
@@ -149,6 +158,27 @@
 							>
 								{option.example}
 							</span>
+						</button>
+					{/each}
+				</div>
+			</div>
+
+			<!-- Auto-check -->
+			<div class="flex flex-col gap-3">
+				<span class="text-[10px] font-medium uppercase tracking-wider" style="color: var(--text-muted);">
+					Update Checking
+				</span>
+				<div class="flex gap-1.5">
+					{#each intervalOptions as opt}
+						{@const isActive = getCheckInterval() === opt.value}
+						<button
+							class="flex-1 rounded-md px-2 py-1.5 text-center text-[11px] font-medium transition-colors duration-100"
+							style={isActive
+								? 'background-color: var(--accent); color: var(--bg-primary);'
+								: 'background-color: var(--bg-primary); color: var(--text-muted);'}
+							onclick={() => setCheckInterval(opt.value)}
+						>
+							{opt.label}
 						</button>
 					{/each}
 				</div>
