@@ -20,19 +20,33 @@ Or check the [Releases page](https://github.com/stef-the/pkg-manager/releases) f
 
 ### One-line Install
 
+#### macOS (Apple Silicon)
+
 ```bash
-# macOS (Apple Silicon)
 curl -L https://github.com/stef-the/pkg-manager/releases/latest/download/Pkg.Manager_0.1.0_aarch64.dmg -o /tmp/PkgManager.dmg && hdiutil attach /tmp/PkgManager.dmg && cp -R "/Volumes/Pkg Manager/Pkg Manager.app" /Applications/ && hdiutil detach "/Volumes/Pkg Manager" && xattr -cr "/Applications/Pkg Manager.app" && open "/Applications/Pkg Manager.app"
+```
 
-# macOS (Intel)
+#### macOS (Intel)
+
+```bash
 curl -L https://github.com/stef-the/pkg-manager/releases/latest/download/Pkg.Manager_0.1.0_x64.dmg -o /tmp/PkgManager.dmg && hdiutil attach /tmp/PkgManager.dmg && cp -R "/Volumes/Pkg Manager/Pkg Manager.app" /Applications/ && hdiutil detach "/Volumes/Pkg Manager" && xattr -cr "/Applications/Pkg Manager.app" && open "/Applications/Pkg Manager.app"
+```
 
-# Linux (deb)
+#### Linux (Debian / Ubuntu)
+
+```bash
 curl -L https://github.com/stef-the/pkg-manager/releases/latest/download/pkg-manager_0.1.0_amd64.deb -o /tmp/pkg-manager.deb && sudo dpkg -i /tmp/pkg-manager.deb && pkg-manager
+```
 
-# Linux (AppImage)
+#### Linux (AppImage)
+
+```bash
 curl -L https://github.com/stef-the/pkg-manager/releases/latest/download/pkg-manager_0.1.0_amd64.AppImage -o ~/.local/bin/pkg-manager && chmod +x ~/.local/bin/pkg-manager && ~/.local/bin/pkg-manager
 ```
+
+#### Windows
+
+Download and run the installer: [Pkg Manager_0.1.0_x64-setup.exe](https://github.com/stef-the/pkg-manager/releases/latest/download/Pkg.Manager_0.1.0_x64-setup.exe)
 
 ## Features
 
