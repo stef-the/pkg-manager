@@ -91,6 +91,11 @@ async function loadPackagesForManager(manager: PackageManager): Promise<void> {
 		updated.set(manager, pkgs);
 		packages = updated;
 		log.info(`Loaded ${pkgs.length} packages for ${manager}`);
+
+		// Background: enrich descriptions for brew (no-op for other managers)
+		if (manager === 'brew' && pkgs.length > 0) {
+			enrichDescriptions(manager, pkgs);
+		}
 	} catch (e) {
 		const msg = `Failed to load ${manager} packages: ${e}`;
 		log.error(msg);
@@ -110,6 +115,28 @@ async function loadOutdatedForManager(manager: PackageManager): Promise<void> {
 		const msg = `Failed to check outdated ${manager} packages: ${e}`;
 		log.error(msg);
 		addToast(msg, 'error');
+	}
+}
+
+async function enrichDescriptions(manager: PackageManager, pkgs: Package[]): Promise<void> {
+	const names = pkgs.map((p) => p.name);
+	try {
+		const descriptions = await commands.enrichDescriptions(manager, names);
+		if (descriptions.length > 0) {
+			const updated = new Map(packages);
+			const managerPkgs = updated.get(manager);
+			if (managerPkgs) {
+				for (const [name, desc] of descriptions) {
+					const pkg = managerPkgs.find((p) => p.name === name);
+					if (pkg) pkg.description = desc;
+				}
+				updated.set(manager, [...managerPkgs]); // trigger reactivity
+				packages = updated;
+			}
+			log.info(`Enriched ${descriptions.length} ${manager} descriptions`);
+		}
+	} catch {
+		// Non-critical, silently ignore
 	}
 }
 

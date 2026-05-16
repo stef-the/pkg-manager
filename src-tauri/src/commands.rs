@@ -257,6 +257,50 @@ pub async fn get_package_detail(manager: String, name: String) -> Result<crate::
 }
 
 #[tauri::command]
+pub async fn enrich_descriptions(manager: String, names: Vec<String>) -> Result<Vec<(String, String)>, String> {
+    blocking(move || {
+        log::info!("Command: enrich_descriptions({}, {} packages)", manager, names.len());
+        let mut results: Vec<(String, String)> = Vec::new();
+
+        if manager != "brew" {
+            return Ok(results);
+        }
+
+        // Process in chunks of 30
+        for chunk in names.chunks(30) {
+            let mut args: Vec<&str> = vec!["info", "--json=v2"];
+            args.extend(chunk.iter().map(|s| s.as_str()));
+
+            if let Ok(output) = run_command("brew", &args) {
+                if let Ok(json) = serde_json::from_str::<serde_json::Value>(&output) {
+                    if let Some(formulae) = json.get("formulae").and_then(|f| f.as_array()) {
+                        for formula in formulae {
+                            let name = formula.get("name").and_then(|n| n.as_str()).unwrap_or("");
+                            let desc = formula.get("desc").and_then(|d| d.as_str()).unwrap_or("");
+                            if !name.is_empty() && !desc.is_empty() {
+                                results.push((name.to_string(), desc.to_string()));
+                            }
+                        }
+                    }
+                    if let Some(casks) = json.get("casks").and_then(|c| c.as_array()) {
+                        for cask in casks {
+                            let name = cask.get("token").and_then(|n| n.as_str()).unwrap_or("");
+                            let desc = cask.get("desc").and_then(|d| d.as_str()).unwrap_or("");
+                            if !name.is_empty() && !desc.is_empty() {
+                                results.push((name.to_string(), desc.to_string()));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        log::info!("Enriched {} packages with descriptions", results.len());
+        Ok(results)
+    }).await
+}
+
+#[tauri::command]
 pub fn get_package_info_url(manager: String, name: String) -> Result<String, String> {
     match manager.as_str() {
         "brew" => Ok(format!("https://formulae.brew.sh/formula/{}", name)),

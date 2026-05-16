@@ -62,6 +62,7 @@ pub fn run() {
             commands::append_history,
             commands::read_history,
             commands::send_notification,
+            commands::enrich_descriptions,
             commands::scan_installed_apps,
             commands::uninstall_app,
             commands::set_window_title,

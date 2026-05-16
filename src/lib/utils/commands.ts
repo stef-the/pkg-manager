@@ -85,6 +85,15 @@ export async function getPackageManagers(): Promise<ManagerInfo[]> {
 	}
 }
 
+export async function enrichDescriptions(manager: string, names: string[]): Promise<[string, string][]> {
+	try {
+		return await invoke<[string, string][]>('enrich_descriptions', { manager, names });
+	} catch (e) {
+		log.warn(`Failed to enrich descriptions: ${e}`);
+		return [];
+	}
+}
+
 export async function getSystemStats(): Promise<SystemStats> {
 	log.info('Getting system stats');
 	try {
