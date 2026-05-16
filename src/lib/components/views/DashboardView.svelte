@@ -175,7 +175,7 @@
 
 		<!-- Center: donut (fills remaining width, fixed height) -->
 		<div
-			class="flex flex-1 items-center gap-6 rounded-lg border px-5 py-3"
+			class="flex flex-1 items-center justify-center gap-6 rounded-lg border px-5 py-3"
 			style="border-color: var(--border-subtle); background-color: var(--surface);"
 		>
 			<svg class="flex-shrink-0" width="130" height="130" viewBox="0 0 120 120">
