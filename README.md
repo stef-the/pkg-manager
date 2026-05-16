@@ -4,6 +4,20 @@ A cross-platform package manager GUI built with SvelteKit, Tailwind CSS v4, and 
 
 <!-- screenshot -->
 
+## Install
+
+Download the latest release for your platform:
+
+| Platform | Download |
+|----------|----------|
+| macOS (Apple Silicon) | [Pkg Manager_0.1.0_aarch64.dmg](https://github.com/stef-the/pkg-manager/releases/latest/download/Pkg.Manager_0.1.0_aarch64.dmg) |
+| macOS (Intel) | [Pkg Manager_0.1.0_x64.dmg](https://github.com/stef-the/pkg-manager/releases/latest/download/Pkg.Manager_0.1.0_x64.dmg) |
+| Windows | [Pkg Manager_0.1.0_x64-setup.exe](https://github.com/stef-the/pkg-manager/releases/latest/download/Pkg.Manager_0.1.0_x64-setup.exe) |
+| Linux (deb) | [pkg-manager_0.1.0_amd64.deb](https://github.com/stef-the/pkg-manager/releases/latest/download/pkg-manager_0.1.0_amd64.deb) |
+| Linux (AppImage) | [pkg-manager_0.1.0_amd64.AppImage](https://github.com/stef-the/pkg-manager/releases/latest/download/pkg-manager_0.1.0_amd64.AppImage) |
+
+Or check the [Releases page](https://github.com/stef-the/pkg-manager/releases) for all options.
+
 ## Features
 
 ### Package Managers
