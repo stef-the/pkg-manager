@@ -108,14 +108,18 @@
 		}
 	}
 
-	// Load storage info (once — uses df, instant)
+	// Load storage info (once — uses df, instant, infallible)
 	let storageLoaded = false;
 	$effect(() => {
 		if (storageLoaded) return;
 		storageLoaded = true;
 		if (typeof window !== 'undefined' && '__TAURI__' in window) {
 			invoke<StorageInfo>('get_storage_info')
-				.then((data) => { storageInfo = data; })
+				.then((data) => {
+					if (data && data.diskTotal && data.diskTotal !== '0KB') {
+						storageInfo = data;
+					}
+				})
 				.catch(() => {});
 		}
 	});

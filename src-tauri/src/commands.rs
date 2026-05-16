@@ -371,21 +371,26 @@ pub fn open_url(url: String) -> Result<(), String> {
 }
 
 #[tauri::command]
-pub fn get_storage_info() -> Result<crate::models::StorageInfo, String> {
+pub fn get_storage_info() -> crate::models::StorageInfo {
     log::info!("Command: get_storage_info");
 
-    let output = run_command_allow_failure("df", &["-k", "/"])
-        .map_err(|e| format!("df failed: {}", e))?;
+    let (total_kb, avail_kb) = match std::process::Command::new("df").args(["-k", "/"]).output() {
+        Ok(output) => {
+            let stdout = String::from_utf8_lossy(&output.stdout);
+            let line = stdout.lines().nth(1).unwrap_or("");
+            let parts: Vec<&str> = line.split_whitespace().collect();
+            if parts.len() >= 4 {
+                (
+                    parts[1].parse::<u64>().unwrap_or(0),
+                    parts[3].parse::<u64>().unwrap_or(0),
+                )
+            } else {
+                (0, 0)
+            }
+        }
+        Err(_) => (0, 0),
+    };
 
-    let line = output.lines().nth(1).unwrap_or("");
-    let parts: Vec<&str> = line.split_whitespace().collect();
-
-    if parts.len() < 4 {
-        return Err("Could not parse df output".to_string());
-    }
-
-    let total_kb: u64 = parts[1].parse().unwrap_or(0);
-    let avail_kb: u64 = parts[3].parse().unwrap_or(0);
     let total = total_kb * 1024;
     let available = avail_kb * 1024;
     let used = total.saturating_sub(available);
@@ -405,12 +410,12 @@ pub fn get_storage_info() -> Result<crate::models::StorageInfo, String> {
     let pct = if total > 0 { (used as f64 / total as f64 * 100.0).round() as u64 } else { 0 };
     log::info!("Storage: {} / {} ({}%)", fmt(used), fmt(total), pct);
 
-    Ok(crate::models::StorageInfo {
+    crate::models::StorageInfo {
         disk_total: fmt(total),
         disk_used: fmt(used),
         disk_available: fmt(available),
         disk_pct: pct,
-    })
+    }
 }
 
 #[tauri::command]
