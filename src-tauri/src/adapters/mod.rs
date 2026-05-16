@@ -87,7 +87,7 @@ pub fn run_command(program: &str, args: &[&str]) -> Result<String, AppError> {
         })?;
 
     // Wait with 90 second timeout
-    let timeout = std::time::Duration::from_secs(90);
+    let timeout = std::time::Duration::from_secs(300);
     let start = std::time::Instant::now();
 
     loop {
@@ -154,7 +154,7 @@ pub fn run_command_allow_failure(program: &str, args: &[&str]) -> Result<String,
             }
         })?;
 
-    let timeout = std::time::Duration::from_secs(90);
+    let timeout = std::time::Duration::from_secs(300);
     let start = std::time::Instant::now();
 
     loop {

@@ -1,8 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
-  <!-- Background -->
-  <rect width="512" height="512" rx="96" fill="#2e3440"/>
-  <!-- Package cube -->
-  <path d="M256 112l144 76v160l-144 76-144-76V188z" fill="#3b4252" stroke="#88c0d0" stroke-width="10" stroke-linejoin="round"/>
-  <path d="M112 188l144 76 144-76" fill="none" stroke="#88c0d0" stroke-width="10" stroke-linejoin="round"/>
-  <path d="M256 264v160" stroke="#88c0d0" stroke-width="10"/>
+  <rect width="512" height="512" rx="108" fill="#2e3440"/>
+  <path d="M256 128l120 64v144l-120 64-120-64V192z" fill="none" stroke="#88c0d0" stroke-width="14" stroke-linejoin="round"/>
+  <path d="M136 192l120 64 120-64" fill="none" stroke="#88c0d0" stroke-width="14" stroke-linejoin="round"/>
+  <path d="M256 256v144" stroke="#88c0d0" stroke-width="14"/>
 </svg>
