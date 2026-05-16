@@ -18,6 +18,28 @@ Download the latest release for your platform:
 
 Or check the [Releases page](https://github.com/stef-the/pkg-manager/releases) for all options.
 
+### CLI Install
+
+```bash
+# macOS (Apple Silicon)
+curl -L https://github.com/stef-the/pkg-manager/releases/latest/download/Pkg.Manager_0.1.0_aarch64.dmg -o PkgManager.dmg
+hdiutil attach PkgManager.dmg
+cp -R "/Volumes/Pkg Manager/Pkg Manager.app" /Applications/
+hdiutil detach "/Volumes/Pkg Manager"
+xattr -cr "/Applications/Pkg Manager.app"  # Required for unsigned builds
+
+# Linux (deb)
+curl -L https://github.com/stef-the/pkg-manager/releases/latest/download/pkg-manager_0.1.0_amd64.deb -o pkg-manager.deb
+sudo dpkg -i pkg-manager.deb
+
+# Linux (AppImage)
+curl -L https://github.com/stef-the/pkg-manager/releases/latest/download/pkg-manager_0.1.0_amd64.AppImage -o PkgManager.AppImage
+chmod +x PkgManager.AppImage
+./PkgManager.AppImage
+```
+
+> **macOS Note:** Since the app isn't signed with an Apple Developer certificate, you'll need to run `xattr -cr "/Applications/Pkg Manager.app"` after installing, or right-click > Open the first time.
+
 ## Features
 
 ### Package Managers
