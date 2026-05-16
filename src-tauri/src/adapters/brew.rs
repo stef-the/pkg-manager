@@ -77,29 +77,41 @@ impl PackageManagerAdapter for BrewAdapter {
     fn list_installed(&self) -> Result<Vec<Package>, AppError> {
         log::info!("Listing installed Homebrew packages...");
 
-        let output = run_command("brew", &["info", "--installed", "--json=v2"])?;
-        let json: Value = serde_json::from_str(&output).map_err(|e| {
-            log::error!("Failed to parse brew JSON: {}", e);
-            AppError::ParseError {
-                context: "brew info --installed --json=v2".to_string(),
-                detail: e.to_string(),
-            }
-        })?;
-
+        // Use fast `brew list --versions` (< 1s) instead of slow
+        // `brew info --installed --json=v2` (30-60s with many packages)
+        let output = run_command("brew", &["list", "--formula", "--versions"])?;
         let mut packages = Vec::new();
 
-        if let Some(formulae) = json.get("formulae").and_then(|f| f.as_array()) {
-            for formula in formulae {
-                if let Some(pkg) = Self::parse_formula_package(formula) {
-                    packages.push(pkg);
-                }
+        for line in output.lines() {
+            let line = line.trim();
+            if line.is_empty() { continue; }
+            // Format: "package_name 1.2.3" or "package_name 1.2.3 1.2.2"
+            let mut parts = line.split_whitespace();
+            if let Some(name) = parts.next() {
+                let version = parts.next().unwrap_or("").to_string();
+                packages.push(Package {
+                    name: name.to_string(),
+                    version,
+                    description: String::new(), // No descriptions in fast mode
+                    manager: "brew".to_string(),
+                });
             }
         }
 
-        if let Some(casks) = json.get("casks").and_then(|c| c.as_array()) {
-            for cask in casks {
-                if let Some(pkg) = Self::parse_cask_package(cask) {
-                    packages.push(pkg);
+        // Also list casks
+        if let Ok(cask_output) = run_command("brew", &["list", "--cask", "--versions"]) {
+            for line in cask_output.lines() {
+                let line = line.trim();
+                if line.is_empty() { continue; }
+                let mut parts = line.split_whitespace();
+                if let Some(name) = parts.next() {
+                    let version = parts.next().unwrap_or("").to_string();
+                    packages.push(Package {
+                        name: name.to_string(),
+                        version,
+                        description: String::new(),
+                        manager: "brew".to_string(),
+                    });
                 }
             }
         }
