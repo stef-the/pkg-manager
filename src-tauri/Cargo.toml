@@ -25,4 +25,3 @@ tauri = { version = "2.11.1", features = ["tray-icon"] }
 tauri-plugin-log = "2"
 tauri-plugin-autostart = "2"
 hostname = "0.4"
-tauri-plugin-updater = "2"
