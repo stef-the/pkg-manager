@@ -98,7 +98,8 @@ button:disabled {
 
 /* Scrollbar styling */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {
@@ -107,11 +108,28 @@ button:disabled {
 
 ::-webkit-scrollbar-thumb {
   background: var(--border);
-  border-radius: 3px;
+  border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
+}
+
+/* Hide horizontal scrollbar until hover */
+.overflow-x-auto {
+  scrollbar-width: thin;
+}
+
+.overflow-x-auto::-webkit-scrollbar {
+  height: 3px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+.overflow-x-auto:hover::-webkit-scrollbar-thumb {
+  background: var(--border);
 }
 
 /* Selection styling */
