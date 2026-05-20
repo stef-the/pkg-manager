@@ -60,10 +60,17 @@ pub fn get_all_adapters() -> Vec<Box<dyn PackageManagerAdapter>> {
     ]
 }
 
-/// Platform-aware command existence check
+/// Platform-aware command existence check (quiet — no logging on failure)
 pub fn command_exists(name: &str) -> bool {
     let check_cmd = if cfg!(target_os = "windows") { "where" } else { "which" };
-    run_command(check_cmd, &[name]).is_ok()
+    Command::new(check_cmd)
+        .arg(name)
+        .stdin(std::process::Stdio::null())
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .status()
+        .map(|s| s.success())
+        .unwrap_or(false)
 }
 
 /// Run a shell command with a 90-second timeout. Returns stdout on success.

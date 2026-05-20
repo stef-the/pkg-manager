@@ -93,18 +93,9 @@ export function startAutoCheck(): void {
 	const ms = checkInterval * 60 * 1000;
 	log.info(`Auto-check: starting, interval ${checkInterval}m`);
 
-	// Check if enough time has passed since last check
-	if (lastCheckTime) {
-		const elapsed = Date.now() - lastCheckTime.getTime();
-		if (elapsed >= ms) {
-			// Due for a check
-			setTimeout(() => checkForUpdates(), 30000); // Wait 30s after app start
-		}
-	} else {
-		// Never checked — do it after startup settles
-		setTimeout(() => checkForUpdates(), 30000);
-	}
-
+	// Don't check immediately on startup — the initial loadAllPackages
+	// already fetches outdated counts. First auto-check after one full interval.
+	saveLastCheck();
 	timer = setInterval(() => checkForUpdates(), ms);
 }
 
