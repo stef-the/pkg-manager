@@ -28,6 +28,10 @@
 		| 'snap'
 		| 'nix'
 		| 'scoop'
+		| 'choco'
+		| 'dnf'
+		| 'pacman'
+		| 'conda'
 		| 'browse'
 		| 'managers';
 </script>
@@ -174,6 +178,23 @@
 		<path d="M4 4h8l-1 9H5L4 4z" fill="currentColor" stroke="none" />
 		<path d="M3 3h10v1.5H3z" fill="currentColor" stroke="none" opacity="0.7" />
 		<rect x="7" y="1" width="2" height="2.5" rx="0.5" fill="currentColor" stroke="none" opacity="0.5" />
+	{:else if name === 'choco'}
+		<!-- Chocolatey -->
+		<rect x="3" y="3" width="10" height="10" rx="2" fill="currentColor" stroke="none" />
+		<path d="M6 7l1.5 1.5L11 5" fill="none" stroke="var(--bg-secondary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+	{:else if name === 'dnf'}
+		<!-- Fedora/DNF -->
+		<circle cx="8" cy="8" r="6" fill="currentColor" stroke="none" />
+		<path d="M5.5 8.5c1.5-3 5-3 5 0" fill="none" stroke="var(--bg-secondary)" stroke-width="1.3" stroke-linecap="round" />
+		<circle cx="8" cy="5.5" r="1" fill="var(--bg-secondary)" stroke="none" />
+	{:else if name === 'pacman'}
+		<!-- Pacman (Arch) -->
+		<path d="M8 2a6 6 0 110 12 6 6 0 010-12z" fill="currentColor" stroke="none" />
+		<path d="M9 6l3 2-3 2" fill="var(--bg-secondary)" stroke="none" />
+	{:else if name === 'conda'}
+		<!-- Conda/Anaconda snake -->
+		<circle cx="8" cy="8" r="6" fill="currentColor" stroke="none" />
+		<path d="M5 10c1-3 2-5 3-5s2 2 3 2 2-1.5 2-1.5" fill="none" stroke="var(--bg-secondary)" stroke-width="1.3" stroke-linecap="round" />
 	{:else if name === 'browse'}
 		<!-- Compass / browse -->
 		<circle cx="8" cy="8" r="6" />

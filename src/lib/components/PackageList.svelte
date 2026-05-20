@@ -56,7 +56,8 @@
 			brew: 'var(--color-nord7)', npm: 'var(--color-nord11)', winget: 'var(--color-nord9)',
 			mas: 'var(--color-nord10)', pip: 'var(--color-nord13)', cargo: 'var(--color-nord12)',
 			apt: 'var(--color-nord15)', flatpak: 'var(--color-nord14)', snap: 'var(--color-nord8)',
-			nix: 'var(--color-nord9)', scoop: 'var(--color-nord7)'
+			nix: 'var(--color-nord9)', scoop: 'var(--color-nord7)',
+			choco: 'var(--color-nord12)', dnf: 'var(--color-nord10)', pacman: 'var(--color-nord9)', conda: 'var(--color-nord14)'
 		};
 		return colors[id] ?? 'var(--text-muted)';
 	}
@@ -65,7 +66,7 @@
 		const map: Record<string, import('./Icons.svelte').IconName> = {
 			brew: 'brew', npm: 'npm', winget: 'winget', mas: 'mas',
 			pip: 'pip', cargo: 'cargo', apt: 'apt', flatpak: 'flatpak',
-			snap: 'snap', nix: 'nix', scoop: 'scoop'
+			snap: 'snap', nix: 'nix', scoop: 'scoop', choco: 'choco', dnf: 'dnf', pacman: 'pacman', conda: 'conda'
 		};
 		return map[id] ?? 'installed';
 	}

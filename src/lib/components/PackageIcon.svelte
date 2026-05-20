@@ -20,7 +20,7 @@
 		const map: Record<string, IconName> = {
 			brew: 'brew', npm: 'npm', winget: 'winget', mas: 'mas',
 			pip: 'pip', cargo: 'cargo', apt: 'apt', flatpak: 'flatpak',
-			snap: 'snap', nix: 'nix', scoop: 'scoop'
+			snap: 'snap', nix: 'nix', scoop: 'scoop', choco: 'choco', dnf: 'dnf', pacman: 'pacman', conda: 'conda'
 		};
 		return map[id] ?? 'installed';
 	}

@@ -55,6 +55,14 @@
 				return { name: 'Flatpak', icon: 'flatpak', description: 'Linux app sandboxing and distribution framework', installUrl: 'https://flatpak.org/setup/', platforms: ['linux'] };
 			case 'snap':
 				return { name: 'Snap', icon: 'snap', description: 'Universal Linux package format by Canonical', installUrl: 'https://snapcraft.io/docs/installing-snapd', platforms: ['linux'] };
+			case 'choco':
+				return { name: 'Chocolatey', icon: 'choco', description: 'The package manager for Windows', installUrl: 'https://chocolatey.org/install', platforms: ['windows'] };
+			case 'dnf':
+				return { name: 'DNF', icon: 'dnf', description: 'Package manager for Fedora, RHEL, and CentOS', installUrl: 'https://fedoraproject.org', platforms: ['linux'] };
+			case 'pacman':
+				return { name: 'Pacman', icon: 'pacman', description: 'Package manager for Arch Linux and derivatives', installUrl: 'https://archlinux.org', platforms: ['linux'] };
+			case 'conda':
+				return { name: 'Conda', icon: 'conda', description: 'Package and environment manager for data science', installUrl: 'https://docs.conda.io/en/latest/miniconda.html', platforms: ['macos', 'windows', 'linux'] };
 			default:
 				return { name: id, icon: 'installed', description: '', installUrl: '', platforms: ['macos', 'windows', 'linux'] };
 		}
@@ -75,7 +83,7 @@
 		switch (p) { case 'macos': return 'macOS'; case 'windows': return 'Windows'; case 'linux': return 'Linux'; }
 	}
 
-	const knownManagers = ['brew', 'npm', 'mas', 'pip', 'cargo', 'nix', 'scoop', 'winget', 'apt', 'flatpak', 'snap'];
+	const knownManagers = ['brew', 'npm', 'mas', 'pip', 'cargo', 'conda', 'nix', 'scoop', 'choco', 'winget', 'apt', 'dnf', 'pacman', 'flatpak', 'snap'];
 	const detectedManagers = $derived(getManagers());
 	const detectedIds = $derived(new Set(detectedManagers.map((m) => m.id)));
 </script>

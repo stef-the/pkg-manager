@@ -1,4 +1,4 @@
-export type PackageManager = 'brew' | 'npm' | 'winget' | 'mas' | 'pip' | 'cargo' | 'apt' | 'flatpak' | 'snap' | 'nix' | 'scoop';
+export type PackageManager = 'brew' | 'npm' | 'winget' | 'mas' | 'pip' | 'cargo' | 'apt' | 'flatpak' | 'snap' | 'nix' | 'scoop' | 'choco' | 'dnf' | 'pacman' | 'conda';
 
 export interface Package {
 	name: string;
