@@ -19,6 +19,28 @@ use crate::models::{ManagerInfo, OutdatedPackage, Package};
 use log;
 use std::process::Command;
 
+/// Windows process-creation flag that suppresses the console window which would
+/// otherwise flash open for every spawned CLI subprocess.
+#[cfg(target_os = "windows")]
+const CREATE_NO_WINDOW: u32 = 0x0800_0000;
+
+/// Build a [`Command`] that does not pop a console window on Windows.
+///
+/// A GUI Tauri app has no console of its own, so each child process spawned via
+/// `std::process::Command` is given a brand-new console window unless the
+/// `CREATE_NO_WINDOW` creation flag is set. Probing 15 package managers at
+/// startup therefore flashes 15 terminal windows. On non-Windows platforms this
+/// is identical to `Command::new`.
+pub fn hidden_command<S: AsRef<std::ffi::OsStr>>(program: S) -> Command {
+    let mut cmd = Command::new(program);
+    #[cfg(target_os = "windows")]
+    {
+        use std::os::windows::process::CommandExt;
+        cmd.creation_flags(CREATE_NO_WINDOW);
+    }
+    cmd
+}
+
 pub trait PackageManagerAdapter: Send + Sync {
     fn info(&self) -> ManagerInfo;
     fn is_available(&self) -> bool;
@@ -75,7 +97,7 @@ pub fn get_all_adapters() -> Vec<Box<dyn PackageManagerAdapter>> {
 /// Platform-aware command existence check (quiet — no logging on failure)
 pub fn command_exists(name: &str) -> bool {
     let check_cmd = if cfg!(target_os = "windows") { "where" } else { "which" };
-    Command::new(check_cmd)
+    hidden_command(check_cmd)
         .arg(name)
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::null())
@@ -91,7 +113,7 @@ pub fn run_command(program: &str, args: &[&str]) -> Result<String, AppError> {
     let cmd_str = format!("{} {}", program, args.join(" "));
     log::debug!("Running command: {}", cmd_str);
 
-    let mut child = Command::new(program)
+    let mut child = hidden_command(program)
         .args(args)
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::piped())
@@ -159,7 +181,7 @@ pub fn run_command_allow_failure(program: &str, args: &[&str]) -> Result<String,
     let cmd_str = format!("{} {}", program, args.join(" "));
     log::debug!("Running command (allow failure): {}", cmd_str);
 
-    let mut child = Command::new(program)
+    let mut child = hidden_command(program)
         .args(args)
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::piped())

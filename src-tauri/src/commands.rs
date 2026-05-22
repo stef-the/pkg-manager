@@ -360,7 +360,7 @@ pub fn open_url(url: String) -> Result<(), String> {
     #[cfg(target_os = "macos")]
     { std::process::Command::new("open").arg(&url).spawn().map_err(|e| format!("{}", e))?; }
     #[cfg(target_os = "windows")]
-    { std::process::Command::new("cmd").args(["/C", "start", &url]).spawn().map_err(|e| format!("{}", e))?; }
+    { crate::adapters::hidden_command("cmd").args(["/C", "start", "", &url]).spawn().map_err(|e| format!("{}", e))?; }
     #[cfg(target_os = "linux")]
     { std::process::Command::new("xdg-open").arg(&url).spawn().map_err(|e| format!("{}", e))?; }
     Ok(())
@@ -545,7 +545,7 @@ pub async fn uninstall_app(path: String) -> Result<(), String> {
         }
         #[cfg(target_os = "windows")]
         {
-            std::process::Command::new("cmd").args(["/C", &path]).stdin(std::process::Stdio::null()).spawn()
+            crate::adapters::hidden_command("cmd").args(["/C", &path]).stdin(std::process::Stdio::null()).spawn()
                 .map_err(|e| format!("Failed to run uninstaller: {}", e))?;
             return Ok(());
         }

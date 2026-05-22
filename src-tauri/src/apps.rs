@@ -112,7 +112,7 @@ fn get_macos_app_version(app_path: &Path) -> String {
 #[cfg(target_os = "windows")]
 fn scan_windows_apps(apps: &mut Vec<InstalledApp>) {
     // Read from registry
-    let output = std::process::Command::new("reg")
+    let output = crate::adapters::hidden_command("reg")
         .args(["query", r"HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall", "/s"])
         .stdin(std::process::Stdio::null())
         .output();
@@ -166,7 +166,7 @@ fn scan_windows_apps(apps: &mut Vec<InstalledApp>) {
     }
 
     // Also check user registry
-    let output = std::process::Command::new("reg")
+    let output = crate::adapters::hidden_command("reg")
         .args(["query", r"HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall", "/s"])
         .stdin(std::process::Stdio::null())
         .output();
