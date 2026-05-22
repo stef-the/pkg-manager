@@ -276,29 +276,19 @@ pub async fn enrich_descriptions(manager: String, names: Vec<String>) -> Result<
             return Ok(results);
         }
 
-        // Process in chunks of 30
-        for chunk in names.chunks(30) {
-            let mut args: Vec<&str> = vec!["info", "--json=v2"];
+        // Use `brew desc` which is purpose-built and fast (< 2s for all packages)
+        // Process in chunks of 50 (brew desc handles many names well)
+        for chunk in names.chunks(50) {
+            let mut args: Vec<&str> = vec!["desc"];
             args.extend(chunk.iter().map(|s| s.as_str()));
 
             if let Ok(output) = run_command("brew", &args) {
-                if let Ok(json) = serde_json::from_str::<serde_json::Value>(&output) {
-                    if let Some(formulae) = json.get("formulae").and_then(|f| f.as_array()) {
-                        for formula in formulae {
-                            let name = formula.get("name").and_then(|n| n.as_str()).unwrap_or("");
-                            let desc = formula.get("desc").and_then(|d| d.as_str()).unwrap_or("");
-                            if !name.is_empty() && !desc.is_empty() {
-                                results.push((name.to_string(), desc.to_string()));
-                            }
-                        }
-                    }
-                    if let Some(casks) = json.get("casks").and_then(|c| c.as_array()) {
-                        for cask in casks {
-                            let name = cask.get("token").and_then(|n| n.as_str()).unwrap_or("");
-                            let desc = cask.get("desc").and_then(|d| d.as_str()).unwrap_or("");
-                            if !name.is_empty() && !desc.is_empty() {
-                                results.push((name.to_string(), desc.to_string()));
-                            }
+                for line in output.lines() {
+                    if let Some(colon_pos) = line.find(": ") {
+                        let name = line[..colon_pos].trim();
+                        let desc = line[colon_pos + 2..].trim();
+                        if !name.is_empty() && !desc.is_empty() {
+                            results.push((name.to_string(), desc.to_string()));
                         }
                     }
                 }
